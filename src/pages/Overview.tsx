@@ -122,32 +122,32 @@ export default function Overview() {
       </div>
 
       {/* 5 KPI Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         {kpiCards.map((card, idx) => {
           const Icon = card.icon
           const chartData = card.sparkline.map((v, i) => ({ i, v }))
           return (
-            <div key={idx} className="card p-4 flex flex-col justify-between overflow-hidden relative group hover:border-slate-300 transition-all">
-              <div className="flex items-start gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.iconBg}`}>
-                  <Icon className="w-5 h-5" />
+            <div key={idx} className="card p-3 flex flex-col justify-between overflow-hidden relative group hover:border-slate-300 transition-all rounded-xl">
+              <div className="flex items-start gap-2.5">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${card.iconBg}`}>
+                  <Icon className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-3xl font-extrabold text-slate-900 tracking-tight">{card.value}</div>
-                  <div className="text-xs font-medium text-slate-500 leading-snug mt-0.5">{card.title}</div>
-                  <div className={`text-[11px] font-semibold mt-1 ${card.changeColor}`}>{card.change}</div>
+                  <div className="text-2xl font-bold text-slate-900 tracking-tight leading-none">{card.value}</div>
+                  <div className="text-[11px] font-medium text-slate-500 leading-tight mt-1">{card.title}</div>
+                  <div className={`text-[10px] font-semibold mt-0.5 ${card.changeColor}`}>{card.change}</div>
                 </div>
               </div>
 
               {/* Sparkline Chart Area */}
-              <div className="h-9 -mx-4 -mb-4 mt-3 opacity-80 group-hover:opacity-100 transition-opacity">
+              <div className="h-6 -mx-3 -mb-3 mt-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
                     <Area
                       type="monotone"
                       dataKey="v"
                       stroke={card.strokeColor}
-                      strokeWidth={2}
+                      strokeWidth={1.8}
                       fill={card.fillColor}
                       isAnimationActive={false}
                     />
@@ -273,21 +273,21 @@ export default function Overview() {
       </div>
 
       {/* Bottom Section: 3 Analytic Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
         {/* Card 1: Detections Over Time */}
-        <div className="card p-5 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-teal-600" />
-              <h3 className="font-bold text-slate-900 text-sm">Detections Over Time</h3>
+        <div className="card p-3.5 flex flex-col justify-between rounded-xl">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-teal-600" />
+              <h3 className="font-bold text-slate-900 text-xs">Detections Over Time</h3>
             </div>
-            <div className="flex items-center gap-1 text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+            <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
               <span>Today</span>
               <ChevronDown className="w-3 h-3 text-slate-400" />
             </div>
           </div>
 
-          <div className="h-52 w-full">
+          <div className="h-36 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trendData}>
                 <defs>
@@ -300,7 +300,7 @@ export default function Overview() {
                   type="monotone"
                   dataKey="industrial"
                   stroke="#0D9488"
-                  strokeWidth={2.5}
+                  strokeWidth={2}
                   fill="url(#areaGrad)"
                 />
               </AreaChart>
@@ -309,24 +309,24 @@ export default function Overview() {
         </div>
 
         {/* Card 2: Classification Distribution */}
-        <div className="card p-5 flex flex-col justify-between">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="card p-3.5 flex flex-col justify-between rounded-xl">
+          <div className="flex items-center gap-1.5 mb-2">
             <span className="w-2 h-2 rounded-full bg-teal-600" />
-            <h3 className="font-bold text-slate-900 text-sm">Classification Distribution</h3>
+            <h3 className="font-bold text-slate-900 text-xs">Classification Distribution</h3>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Donut Chart */}
-            <div className="relative w-36 h-36 shrink-0">
+            <div className="relative w-28 h-28 shrink-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={classificationDistributionData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={42}
-                    outerRadius={65}
-                    paddingAngle={3}
+                    innerRadius={32}
+                    outerRadius={50}
+                    paddingAngle={2}
                     dataKey="value"
                   >
                     {classificationDistributionData.map((entry, index) => (
@@ -336,18 +336,18 @@ export default function Overview() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="font-extrabold text-slate-900 text-lg">120</span>
-                <span className="text-[10px] text-slate-500 font-semibold">Total</span>
+                <span className="font-extrabold text-slate-900 text-sm">120</span>
+                <span className="text-[9px] text-slate-500 font-semibold">Total</span>
               </div>
             </div>
 
             {/* Legend list */}
-            <div className="flex-1 space-y-1.5 text-xs">
+            <div className="flex-1 space-y-1 text-[11px]">
               {classificationDistributionData.map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                    <span className="text-slate-700 font-medium truncate max-w-[100px]">{item.name}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className="text-slate-700 font-medium truncate max-w-[90px]">{item.name}</span>
                   </div>
                   <span className="font-bold text-slate-900">{item.value} <span className="text-slate-400 font-normal">({item.pct})</span></span>
                 </div>
@@ -357,23 +357,23 @@ export default function Overview() {
         </div>
 
         {/* Card 3: Risk Level Summary */}
-        <div className="card p-5 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-slate-900 text-sm">Risk Level Summary</h3>
+        <div className="card p-3.5 flex flex-col justify-between rounded-xl">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-bold text-slate-900 text-xs">Risk Level Summary</h3>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Gauge Donut Chart */}
-            <div className="relative w-36 h-36 shrink-0">
+            <div className="relative w-28 h-28 shrink-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={riskLevelSummaryData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={42}
-                    outerRadius={65}
-                    paddingAngle={3}
+                    innerRadius={32}
+                    outerRadius={50}
+                    paddingAngle={2}
                     dataKey="count"
                   >
                     {riskLevelSummaryData.map((entry, index) => (
@@ -383,17 +383,17 @@ export default function Overview() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="font-extrabold text-slate-900 text-base">33%</span>
-                <span className="text-[10px] text-slate-500 font-semibold">High Risk</span>
+                <span className="font-extrabold text-slate-900 text-xs">33%</span>
+                <span className="text-[9px] text-slate-500 font-semibold">High Risk</span>
               </div>
             </div>
 
             {/* Legend list */}
-            <div className="flex-1 space-y-1.5 text-xs">
+            <div className="flex-1 space-y-1 text-[11px]">
               {riskLevelSummaryData.map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
                     <span className="text-slate-700 font-medium">{item.name}</span>
                   </div>
                   <span className="font-bold text-slate-900">{item.count} <span className="text-slate-400 font-normal">({item.pct})</span></span>
@@ -402,7 +402,7 @@ export default function Overview() {
             </div>
           </div>
 
-          <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1 mt-3">
+          <div className="text-[10px] text-slate-400 font-medium flex items-center gap-1 mt-2">
             <span>Based on priority scoring model</span>
             <Info className="w-3 h-3 text-slate-400" />
           </div>
