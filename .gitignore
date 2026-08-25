@@ -4,3 +4,17 @@ dist/
 .env
 .env.local
 .DS_Store
+
+# Python (ml/, workers/, backend/)
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Trained ML artifacts (regenerate via ml/training/*) and generated reports
+ml/models/*.joblib
+ml/models/*.json
+ml/evaluation/reports/*.json
+ml/evaluation/reports/*.png
+ml/evaluation/reports/*.txt
