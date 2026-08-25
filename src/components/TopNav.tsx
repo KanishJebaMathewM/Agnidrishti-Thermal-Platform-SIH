@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Bell, ChevronDown, Eye, ListFilter, Archive, AlertTriangle, TrendingUp, Database, Cpu } from 'lucide-react'
+import { Bell, ChevronDown, Eye, ListFilter, Archive, AlertTriangle, TrendingUp, Database, Cpu, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 const navItems = [
@@ -14,11 +14,12 @@ const navItems = [
 
 export default function TopNav() {
   const [profileOpen, setProfileOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
-      <div className="max-w-[1700px] mx-auto px-4 lg:px-6">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-[1700px] mx-auto px-4 xl:px-6">
+        <div className="flex items-center justify-between h-16 gap-2">
           {/* Logo & Subtitle */}
           <div className="flex items-center gap-3 shrink-0">
             <div className="w-9 h-9 rounded-full bg-[#00695C] flex items-center justify-center shadow-xs shrink-0">
@@ -27,14 +28,14 @@ export default function TopNav() {
                 <circle cx="16" cy="16" r="3.5" fill="#EF4444" />
               </svg>
             </div>
-            <div>
+            <div className="shrink-0">
               <div className="font-display font-bold text-slate-900 text-lg leading-tight tracking-tight">AGNIDRISHTI</div>
               <div className="text-[11px] font-medium text-slate-500 leading-tight">Thermal Anomaly Intelligence</div>
             </div>
           </div>
 
-          {/* Center Navigation Tabs */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+          {/* Desktop Navigation Tabs (Visible on XL screens and above: >= 1280px) */}
+          <nav className="hidden xl:flex items-center gap-1 2xl:gap-2 shrink-0">
             {navItems.map((item) => {
               const Icon = item.icon
               return (
@@ -43,7 +44,7 @@ export default function TopNav() {
                   to={item.to}
                   end={item.to === '/'}
                   className={({ isActive }) =>
-                    `relative inline-flex items-center gap-2 px-3 py-2 text-xs xl:text-sm font-semibold transition-all rounded-[14px] ${
+                    `relative inline-flex items-center gap-2 px-3 py-2 text-xs 2xl:text-sm font-semibold transition-all rounded-[14px] whitespace-nowrap ${
                       isActive
                         ? 'bg-[#E4F2F0] text-[#005A52]'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
@@ -53,7 +54,7 @@ export default function TopNav() {
                   {({ isActive }) => (
                     <>
                       <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#005A52]' : 'text-slate-500'}`} />
-                      <span>{item.label}</span>
+                      <span className="whitespace-nowrap">{item.label}</span>
                       {isActive && (
                         <span className="absolute bottom-0 left-3 right-3 h-[2.5px] bg-[#00897B] rounded-full" />
                       )}
@@ -65,37 +66,40 @@ export default function TopNav() {
           </nav>
 
           {/* Right Status & Profile Controls */}
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Live Sync Status */}
-            <div className="hidden md:flex items-center gap-2 text-xs bg-slate-50 border border-slate-200/90 px-3 py-1.5 rounded-full">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Live Sync Status - Visible on 2XL screens */}
+            <div className="hidden 2xl:flex items-center gap-2 text-xs bg-slate-50 border border-slate-200/90 px-3 py-1.5 rounded-full shrink-0">
               <span className="relative flex w-2 h-2">
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
                 <span className="relative w-2 h-2 rounded-full bg-emerald-600" />
               </span>
-              <span className="text-slate-600 font-medium font-mono text-[11px]">
+              <span className="text-slate-600 font-medium font-mono text-[11px] whitespace-nowrap">
                 Live <span className="text-slate-300">·</span> Last sync 2m ago
               </span>
             </div>
 
             {/* Notification Bell */}
-            <button className="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none" aria-label="Notifications">
+            <button className="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none shrink-0" aria-label="Notifications">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center font-mono shadow-2xs">23</span>
             </button>
 
             {/* User Profile Pill */}
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
-                onClick={() => setProfileOpen(!profileOpen)}
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors shadow-2xs focus:outline-none"
+                onClick={() => {
+                  setProfileOpen(!profileOpen)
+                  if (mobileMenuOpen) setMobileMenuOpen(false)
+                }}
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors shadow-2xs focus:outline-none shrink-0"
               >
-                <div className="w-7 h-7 rounded-lg bg-[#00695C] text-white text-xs font-bold flex items-center justify-center font-display shadow-2xs">OC</div>
-                <span className="hidden md:block text-xs font-semibold text-slate-800">Ops Center — Delhi</span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                <div className="w-7 h-7 rounded-lg bg-[#00695C] text-white text-xs font-bold flex items-center justify-center font-display shadow-2xs shrink-0">OC</div>
+                <span className="hidden sm:block text-xs font-semibold text-slate-800 whitespace-nowrap">Ops Center — Delhi</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 mt-2 w-56 card shadow-lg py-2 z-50">
+                <div className="absolute right-0 mt-2 w-56 card shadow-lg py-2 z-50 bg-white rounded-xl border border-slate-200">
                   <div className="px-4 py-2 border-b border-slate-100">
                     <div className="text-xs font-bold text-slate-900">Ops Center — Delhi</div>
                     <div className="text-[11px] text-slate-500">NTRO · Tier-1 Access</div>
@@ -109,9 +113,69 @@ export default function TopNav() {
                 </div>
               )}
             </div>
+
+            {/* Mobile / Tablet Hamburger Toggle Button (Visible below XL breakpoint: < 1280px) */}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(!mobileMenuOpen)
+                if (profileOpen) setProfileOpen(false)
+              }}
+              className="xl:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none shrink-0"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6 text-slate-800" /> : <Menu className="w-6 h-6 text-slate-800" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile & Tablet Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="xl:hidden border-t border-slate-200/80 bg-white/95 backdrop-blur-md py-3 px-2 shadow-lg rounded-b-2xl">
+            <nav className="flex flex-col gap-1">
+              {navItems.map((item) => {
+                const Icon = item.icon
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === '/'}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition-all rounded-xl ${
+                        isActive
+                          ? 'bg-[#E4F2F0] text-[#005A52]'
+                          : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
+                      }`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-[#005A52]' : 'text-slate-500'}`} />
+                        <span>{item.label}</span>
+                      </>
+                    )}
+                  </NavLink>
+                )
+              })}
+            </nav>
+            {/* Live Sync Status indicator inside Mobile/Tablet Drawer */}
+            <div className="mt-3 pt-3 border-t border-slate-100 px-4 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="relative flex w-2 h-2">
+                  <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
+                  <span className="relative w-2 h-2 rounded-full bg-emerald-600" />
+                </span>
+                <span className="text-slate-600 font-medium font-mono text-xs">
+                  Live System Sync Active
+                </span>
+              </div>
+              <span className="text-[11px] text-slate-400 font-mono">2m ago</span>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   )
 }
+
+
