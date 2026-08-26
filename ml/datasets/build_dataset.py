@@ -68,18 +68,43 @@ def label_observation(
     weak_label_row: dict | None = None,
 ) -> dict:
     """
-    Resolve the label for a single observation using the priority-ordered
-    strategy documented above.
+    Resolve the label for a single observation using a 2-layer strategy:
+    
+    Layer A: Independent weak-label evidence signals (industrial_context, flare, agriculture, forest, unknown).
+    Layer B: Mutually exclusive target class (industrial_fire, persistent_flare_or_kiln, agricultural_burn, forest_fire, unknown).
 
     Returns:
-        {label, label_source, label_confidence, verification_status}
+        {
+          "label": str,                      # Layer B Mutually Exclusive Class
+          "weak_signals": dict,               # Layer A Evidence Signals
+          "label_source": str,
+          "label_confidence": float,
+          "verification_status": str
+        }
     """
     context = context or {}
+    month = _month_of(observation)
+
+    # Layer A: Weak Label Evidence Signals
+    industrial_dist = context.get("nearest_industrial_dist_km")
+    has_industrial = industrial_dist is not None and industrial_dist <= INDUSTRIAL_PROXIMITY_KM
+    has_forest = bool(context.get("is_forest")) and month in FOREST_SEASON_MONTHS
+    has_agri = context.get("land_use_class") == "AGRICULTURAL" and month in AGRICULTURAL_SEASON_MONTHS
+    has_flare = bool(source and source.get("expected_class") in {"Refinery", "Flare", "Kiln"})
+
+    weak_signals = {
+        "industrial_context_signal": has_industrial,
+        "flare_signal": has_flare,
+        "agriculture_signal": has_agri,
+        "forest_signal": has_forest,
+        "unknown_signal": not (has_industrial or has_forest or has_agri or has_flare),
+    }
 
     # 1. Human-verified label (highest quality)
     if human_label and human_label.get("human_label"):
         return {
             "label": human_label["human_label"],
+            "weak_signals": weak_signals,
             "label_source": LABEL_SOURCE_HUMAN,
             "label_confidence": 1.0,
             "verification_status": "VERIFIED",
@@ -89,54 +114,39 @@ def label_observation(
     if weak_label_row and weak_label_row.get("label"):
         return {
             "label": weak_label_row["label"],
+            "weak_signals": weak_signals,
             "label_source": weak_label_row.get("label_source", LABEL_SOURCE_TRAINING_LABEL),
             "label_confidence": weak_label_row.get("label_confidence", 0.5),
             "verification_status": weak_label_row.get("verification_status", "UNVERIFIED"),
         }
 
-    # 3. Weak labeling rules
-    month = _month_of(observation)
+    # 3. Layer B Deterministic Mutually Exclusive Class Resolution
+    if has_flare:
+        final_label = "persistent_flare_or_kiln"
+        src = LABEL_SOURCE_REGISTRY
+        conf = 0.85
+    elif has_industrial:
+        final_label = "industrial_fire"
+        src = LABEL_SOURCE_INDUSTRIAL_RULE
+        conf = 0.70
+    elif has_forest:
+        final_label = "forest_fire"
+        src = LABEL_SOURCE_FOREST_RULE
+        conf = 0.65
+    elif has_agri:
+        final_label = "agricultural_burn"
+        src = LABEL_SOURCE_AGRI_RULE
+        conf = 0.60
+    else:
+        final_label = "unknown"
+        src = LABEL_SOURCE_DEFAULT_UNKNOWN
+        conf = 0.30
 
-    if source and source.get("expected_class"):
-        confidence = source.get("classification_confidence") or 0.0
-        if confidence > SOURCE_REGISTRY_CONFIDENCE_THRESHOLD:
-            return {
-                "label": source["expected_class"],
-                "label_source": LABEL_SOURCE_REGISTRY,
-                "label_confidence": confidence,
-                "verification_status": "UNVERIFIED",
-            }
-
-    if context.get("is_forest") and month in FOREST_SEASON_MONTHS:
-        return {
-            "label": "Forest Fire",
-            "label_source": LABEL_SOURCE_FOREST_RULE,
-            "label_confidence": 0.5,
-            "verification_status": "UNVERIFIED",
-        }
-
-    industrial_dist = context.get("nearest_industrial_dist_km")
-    if industrial_dist is not None and industrial_dist <= INDUSTRIAL_PROXIMITY_KM:
-        return {
-            "label": "Persistent Flare/Kiln",
-            "label_source": LABEL_SOURCE_INDUSTRIAL_RULE,
-            "label_confidence": 0.5,
-            "verification_status": "UNVERIFIED",
-        }
-
-    if context.get("land_use_class") == "AGRICULTURAL" and month in AGRICULTURAL_SEASON_MONTHS:
-        return {
-            "label": "Agricultural Burn",
-            "label_source": LABEL_SOURCE_AGRI_RULE,
-            "label_confidence": 0.5,
-            "verification_status": "UNVERIFIED",
-        }
-
-    # Do not force an uncertain record into a confident class.
     return {
-        "label": "Unknown",
-        "label_source": LABEL_SOURCE_DEFAULT_UNKNOWN,
-        "label_confidence": 0.3,
+        "label": final_label,
+        "weak_signals": weak_signals,
+        "label_source": src,
+        "label_confidence": conf,
         "verification_status": "UNVERIFIED",
     }
 
