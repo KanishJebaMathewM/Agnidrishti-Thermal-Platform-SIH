@@ -60,6 +60,12 @@ export default function IndiaMap({ events, onMarkerClick, selectedId, height = 4
     layerGroup.clearLayers()
 
     events.forEach((e) => {
+      const lat = e.lat ?? (e as any).centroid_lat
+      const lon = e.lon ?? (e as any).centroid_lon
+      if (lat === undefined || lon === undefined || isNaN(Number(lat)) || isNaN(Number(lon))) {
+        return
+      }
+
       if (!layers.anomalies && e.isAnomaly) return
 
       const hue = classificationHue[e.classification] || classificationHue['Unknown']
@@ -67,7 +73,7 @@ export default function IndiaMap({ events, onMarkerClick, selectedId, height = 4
       const radius = e.isAnomaly ? 8 : 6
       const isSelected = e.id === selectedId
 
-      const marker = L.circleMarker([e.lat, e.lon], {
+      const marker = L.circleMarker([Number(lat), Number(lon)], {
         radius,
         fillColor: color,
         color: isSelected ? '#0F172A' : '#FFFFFF',

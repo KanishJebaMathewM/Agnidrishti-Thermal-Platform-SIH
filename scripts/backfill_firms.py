@@ -16,6 +16,8 @@ import os
 import sys
 import time
 from datetime import date, datetime, timedelta
+from dotenv import load_dotenv
+load_dotenv()
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -57,23 +59,46 @@ def backfill(
             print(f"[skip] {chunk_start} - {chunk_end} already completed")
             continue
 
-        run_id = tracker.start_run(SOURCE_TYPE, parameters)
+        run_id = tracker.start_run(SOURCE_TYPE, parameters, data_mode="LIVE")
         try:
             df = client.fetch_archive_chunk(chunk_start, chunk_end)
             fetched = len(df)
+            validated = 0
             inserted = 0
+            duplicates = 0
+            failed = 0
             for _, row in df.iterrows():
-                obs = normalize_firms_row(row)
-                if obs is None:
-                    continue
-                if not is_within_india(obs["latitude"], obs["longitude"], india_geom):
-                    continue
-                if store.insert(obs):
-                    inserted += 1
-            tracker.complete_run(run_id, records_fetched=fetched, records_inserted=inserted)
+                try:
+                    obs = normalize_firms_row(row)
+                    if obs is None:
+                        failed += 1
+                        continue
+                    if not is_within_india(obs["latitude"], obs["longitude"], india_geom):
+                        continue
+                    validated += 1
+                    obs["data_mode"] = "LIVE"
+                    obs["ingestion_run_id"] = run_id
+                    if store.insert(obs):
+                        inserted += 1
+                    else:
+                        duplicates += 1
+                except Exception:
+                    failed += 1
+
+            tracker.complete_run(
+                run_id,
+                records_fetched=fetched,
+                records_inserted=inserted,
+                records_validated=validated,
+                records_skipped_duplicate=duplicates,
+                records_failed=failed,
+                data_mode="LIVE",
+            )
             total_fetched += fetched
             total_inserted += inserted
-            print(f"[ok] {chunk_start} - {chunk_end}: fetched={fetched} inserted={inserted}")
+            print(
+                f"[ok] {chunk_start} - {chunk_end}: fetched={fetched} validated={validated} inserted={inserted} duplicates={duplicates}"
+            )
         except Exception as e:
             tracker.fail_run(run_id, str(e))
             total_skipped += 1
@@ -90,23 +115,32 @@ def backfill(
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--start", required=True, help="YYYY-MM-DD")
-    parser.add_argument("--end", required=True, help="YYYY-MM-DD")
+    parser.add_argument("--start", help="YYYY-MM-DD")
+    parser.add_argument("--end", help="YYYY-MM-DD")
+    parser.add_argument("--days", type=int, help="Number of days to backfill from today")
     parser.add_argument("--tracker-path", default=DEFAULT_TRACKER_PATH)
     args = parser.parse_args()
 
-    map_key = os.getenv("FIRMS_MAP_KEY", "")
+    if args.days:
+        end_dt = date.today()
+        start_dt = end_dt - timedelta(days=args.days - 1)
+    elif args.start and args.end:
+        start_dt = date.fromisoformat(args.start)
+        end_dt = date.fromisoformat(args.end)
+    else:
+        # Default to 1-day test run
+        end_dt = date.today()
+        start_dt = end_dt
+
+    map_key = os.getenv("FIRMS_MAP_KEY") or os.getenv("FIRMS_API_KEY", "")
     if not map_key:
         raise SystemExit("FIRMS_MAP_KEY not configured — set it in the environment or .env")
 
-    start = datetime.strptime(args.start, "%Y-%m-%d").date()
-    end = datetime.strptime(args.end, "%Y-%m-%d").date()
-
     client = FIRMSClient(map_key=map_key)
-    store = InMemoryObservationStore()  # swap for Contributor 1's SQLAlchemyObservationStore
+    store = InMemoryObservationStore()
     tracker = IngestionRunTracker(JSONFileIngestionRunStore(args.tracker_path))
 
-    summary = backfill(client, start, end, store, tracker)
+    summary = backfill(client, start_dt, end_dt, store, tracker)
     print(f"Backfill complete: {summary}")
 
 

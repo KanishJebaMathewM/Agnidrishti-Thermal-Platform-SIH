@@ -61,16 +61,20 @@ export default function Trends() {
     getDashboardTrends()
       .then((res) => {
         if (!isMounted) return
-        setStackedData(
-          res.points.map((p) => ({
-            date: p.date,
-            industrial: p.industrial,
-            flare: p.flare,
-            agri: p.agricultural,
-            forest: p.forest,
-            unknown: p.unknown,
-          })),
-        )
+        if (res.points && res.points.length > 0) {
+          setStackedData(
+            res.points.map((p) => ({
+              date: p.date,
+              industrial: p.industrial,
+              flare: p.flare,
+              agri: p.agricultural,
+              forest: p.forest,
+              unknown: p.unknown,
+            })),
+          )
+        } else {
+          setStackedData(FALLBACK_STACKED_DATA)
+        }
         setTrendsError(null)
       })
       .catch((err) => isMounted && setTrendsError(err.message))

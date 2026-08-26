@@ -98,8 +98,8 @@ export default function TopNav() {
                 {isLive && <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />}
                 <span className={`relative w-2 h-2 rounded-full ${isLive ? 'bg-emerald-600' : 'bg-slate-400'}`} />
               </span>
-              <span className="text-slate-600 font-medium font-mono text-[11px] whitespace-nowrap">
-                {isLive ? 'Live' : 'Offline / Demo Mode'} <span className="text-slate-300">·</span> Last sync {formatDistanceToNow(lastSync)}
+              <span className="text-slate-700 font-bold font-mono text-[11px] whitespace-nowrap">
+                {isLive ? 'LIVE DATA · Source: NASA FIRMS' : 'DEMO / REPLAY MODE'} <span className="text-slate-300">·</span> {formatDistanceToNow(lastSync)}
               </span>
             </div>
 

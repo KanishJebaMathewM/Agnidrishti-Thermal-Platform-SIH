@@ -83,9 +83,21 @@ export default function ModelInsights() {
             <Info className="w-4 h-4 text-slate-400" />
           </div>
           <p className="text-xs sm:text-sm font-medium text-slate-500 mt-1">
-            Explainability, feature importance, and classification performance
+            Explainability, feature importance, and baseline classification performance
           </p>
         </div>
+      </div>
+
+      {/* Model Status Banner */}
+      <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs text-amber-900 shadow-2xs">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
+          <span className="font-bold">MODEL STATUS: Prototype / Baseline Model (xgb_v1_0.joblib)</span>
+          <span className="text-amber-700 hidden lg:inline">• Evaluation pending full 2020–2026 historical dataset ingestion</span>
+        </div>
+        <span className="px-2.5 py-1 rounded-lg bg-amber-200/80 font-mono text-[11px] font-bold text-amber-900 shrink-0">
+          PROTOTYPE V1.0 (PROVISIONAL METRICS)
+        </span>
       </div>
 
       {/* 4 Top KPI Stat Cards */}

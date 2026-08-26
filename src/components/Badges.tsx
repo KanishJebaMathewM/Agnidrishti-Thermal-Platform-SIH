@@ -37,36 +37,42 @@ export function ClassificationBadge({
   )
 }
 
-export function AgencyBadge({ agency }: { agency: Agency }) {
-  const c = agencyColor[agency]
+export function AgencyBadge({ agency }: { agency?: Agency | string }) {
+  const c = (agency && agencyColor[agency as Agency]) || { bg: '#F1F5F9', text: '#475569', border: '#CBD5E1' }
   return (
     <span
       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border"
       style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
     >
-      {agency}
+      {agency || 'State Aggregation'}
     </span>
   )
 }
 
-export function StatusBadge({ status }: { status: 'Suppressed' | 'Escalated' | 'Under Review' }) {
-  const map = {
+export function StatusBadge({ status }: { status?: 'Suppressed' | 'Escalated' | 'Under Review' | string }) {
+  const map: Record<string, { bg: string; text: string; border: string }> = {
     Suppressed: { bg: '#DCFCE7', text: '#15803D', border: '#86EFAC' },
+    FALSE_ALARM: { bg: '#DCFCE7', text: '#15803D', border: '#86EFAC' },
     Escalated: { bg: '#FEE2E2', text: '#991B1B', border: '#FCA5A5' },
+    CONFIRMED: { bg: '#FEE2E2', text: '#991B1B', border: '#FCA5A5' },
     'Under Review': { bg: '#FFEDD5', text: '#C2410C', border: '#FDBA74' },
+    NEW: { bg: '#E0F2FE', text: '#0369A1', border: '#BAE6FD' },
   }
-  const c = map[status]
+  const key = status || 'Under Review'
+  const c = map[key] || map['Under Review']
+  const label = key === 'CONFIRMED' ? 'Escalated' : key === 'FALSE_ALARM' ? 'Suppressed' : key === 'NEW' ? 'Under Review' : key
+
   return (
     <span
       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border"
       style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
     >
-      {status}
+      {label}
     </span>
   )
 }
 
-export function RegistryStatusBadge({ status }: { status: 'Registered' | 'Flagged for Inspection' }) {
+export function RegistryStatusBadge({ status }: { status?: 'Registered' | 'Flagged for Inspection' | string }) {
   if (status === 'Flagged for Inspection') {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
@@ -81,17 +87,18 @@ export function RegistryStatusBadge({ status }: { status: 'Registered' | 'Flagge
   )
 }
 
-export function RegistryTypeBadge({ type }: { type: 'Flare' | 'Kiln' | 'Power Plant' | 'Refinery' | 'Steel Mill' }) {
-  const typeStyles = {
+export function RegistryTypeBadge({ type }: { type?: 'Flare' | 'Kiln' | 'Power Plant' | 'Refinery' | 'Steel Mill' | string }) {
+  const typeStyles: Record<string, string> = {
     Kiln: 'bg-sky-50 text-sky-700 border-sky-200',
     Flare: 'bg-orange-50 text-orange-700 border-orange-200',
     Refinery: 'bg-sky-50 text-sky-700 border-sky-200',
     'Power Plant': 'bg-purple-50 text-purple-700 border-purple-200',
     'Steel Mill': 'bg-slate-100 text-slate-700 border-slate-200',
   }
+  const style = (type && typeStyles[type]) || 'bg-slate-100 text-slate-700 border-slate-200'
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border ${typeStyles[type]}`}>
-      {type}
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border ${style}`}>
+      {type || 'Industrial'}
     </span>
   )
 }

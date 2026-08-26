@@ -110,28 +110,49 @@ class IngestionRunTracker:
     def __init__(self, store: IngestionRunStore | None = None):
         self.store = store or InMemoryIngestionRunStore()
 
-    def start_run(self, source_type: str, parameters: dict) -> str:
+    def start_run(self, source_type: str, parameters: dict, data_mode: str = "LIVE") -> str:
         return self.store.create(
             {
                 "source_type": source_type,
+                "data_mode": data_mode,
                 "run_start": datetime.now(timezone.utc),
                 "run_end": None,
                 "status": "RUNNING",
-                "records_fetched": 0,
+                "records_received_from_api": 0,
+                "records_validated": 0,
                 "records_inserted": 0,
+                "records_updated": 0,
+                "records_skipped_duplicate": 0,
+                "records_failed": 0,
+                "records_fetched": 0,  # alias for backward compatibility
                 "error_message": None,
                 "parameters": parameters,
             }
         )
 
-    def complete_run(self, run_id: str, records_fetched: int, records_inserted: int) -> None:
+    def complete_run(
+        self,
+        run_id: str,
+        records_fetched: int,
+        records_inserted: int,
+        records_validated: int = 0,
+        records_skipped_duplicate: int = 0,
+        records_failed: int = 0,
+        data_mode: str = "LIVE",
+    ) -> None:
+        val_count = records_validated if records_validated > 0 else records_inserted
         self.store.update(
             run_id,
             {
                 "run_end": datetime.now(timezone.utc),
                 "status": "SUCCESS",
+                "data_mode": data_mode,
+                "records_received_from_api": records_fetched,
                 "records_fetched": records_fetched,
+                "records_validated": val_count,
                 "records_inserted": records_inserted,
+                "records_skipped_duplicate": records_skipped_duplicate,
+                "records_failed": records_failed,
             },
         )
 
