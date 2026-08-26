@@ -31,6 +31,13 @@ ml/evaluation/reports/*.txt
 data/raw/
 data/processed/
 data/cache/
-ml/datasets/*.csv
+data/samples/
+ml/datasets/
+*.csv
+*.parquet
+*.sqlite
+*.sqlite3
+
+
 
 

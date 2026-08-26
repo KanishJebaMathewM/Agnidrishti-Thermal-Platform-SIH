@@ -1,12 +1,12 @@
 # AGNIDRISHTI Frontend Runtime & API Validation Report
 
-Generated on: `2026-08-26T16:51:31.127434+00:00`
+Generated on: `2026-08-26T17:06:51.853119+00:00`
 
 ## 1. Executive Summary
 
 | Total Endpoints Tested | Passed | Failed | Max Latency | Overall Verdict |
 |:---|:---|:---|:---|:---|
-| **10** | **10** | **0** | **276.6 ms** | **ALL SCREENS OPERATIONAL [PASS]** |
+| **10** | **10** | **0** | **344.2 ms** | **ALL SCREENS OPERATIONAL [PASS]** |
 
 ---
 
@@ -14,14 +14,14 @@ Generated on: `2026-08-26T16:51:31.127434+00:00`
 
 | Screen Name | Request URL | HTTP Status | Response Time | Payload Size | React State Guaranteed | Verdict |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|
-| **Overview (/)** | `/dashboard/summary` | `200` | `276.6 ms` | `7744 bytes` | `loading = false` | ✅ PASS |
-| **Overview Map (/)** | `/dashboard/map?limit=200` | `200` | `75.6 ms` | `46489 bytes` | `loading = false` | ✅ PASS |
-| **Events (/events)** | `/events?limit=50&page=1` | `200` | `63.1 ms` | `33804 bytes` | `loading = false` | ✅ PASS |
-| **Event Detail (/events/:id)** | `/events/evt-nasa-2020-000000` | `200` | `3.6 ms` | `661 bytes` | `loading = false` | ✅ PASS |
-| **Registry (/registry)** | `/sources?limit=50` | `200` | `3.8 ms` | `613 bytes` | `loading = false` | ✅ PASS |
-| **Alerts & Routing (/alerts)** | `/authorities` | `200` | `3.0 ms` | `721 bytes` | `loading = false` | ✅ PASS |
-| **Trends (/trends)** | `/dashboard/trends` | `200` | `3.0 ms` | `652 bytes` | `loading = false` | ✅ PASS |
-| **Model Insights (/model-insights)** | `/model/current` | `200` | `7.3 ms` | `783 bytes` | `loading = false` | ✅ PASS |
+| **Overview (/)** | `/dashboard/summary` | `200` | `344.2 ms` | `7744 bytes` | `loading = false` | ✅ PASS |
+| **Overview Map (/)** | `/dashboard/map?limit=200` | `200` | `141.1 ms` | `46489 bytes` | `loading = false` | ✅ PASS |
+| **Events (/events)** | `/events?limit=50&page=1` | `200` | `91.8 ms` | `33804 bytes` | `loading = false` | ✅ PASS |
+| **Event Detail (/events/:id)** | `/events/evt-nasa-2020-000000` | `200` | `5.0 ms` | `661 bytes` | `loading = false` | ✅ PASS |
+| **Registry (/registry)** | `/sources?limit=50` | `200` | `7.0 ms` | `613 bytes` | `loading = false` | ✅ PASS |
+| **Alerts & Routing (/alerts)** | `/authorities` | `200` | `4.3 ms` | `721 bytes` | `loading = false` | ✅ PASS |
+| **Trends (/trends)** | `/dashboard/trends` | `200` | `4.0 ms` | `652 bytes` | `loading = false` | ✅ PASS |
+| **Model Insights (/model-insights)** | `/model/current` | `200` | `85.2 ms` | `783 bytes` | `loading = false` | ✅ PASS |
 | **System Diagnostics (/system/diagnostics)** | `/system/diagnostics` | `200` | `4.0 ms` | `303 bytes` | `loading = false` | ✅ PASS |
 | **Health Check (/health)** | `/health` | `200` | `3.0 ms` | `62 bytes` | `loading = false` | ✅ PASS |
 

@@ -14,7 +14,7 @@ import { trendData } from '../data/mockData'
 export default function Overview() {
   const navigate = useNavigate()
   const [showOnlyAnomalies, setShowOnlyAnomalies] = useState(false)
-  const { data: summary, mapEvents: liveMapEvents, loading, error, lastSync } = useDashboardData()
+  const { data: summary, mapEvents: liveMapEvents, loading, error, lastSync, refetch } = useDashboardData()
 
   const mapEvents = useMemo(
     () => (showOnlyAnomalies ? liveMapEvents.filter((e) => e.isAnomaly) : liveMapEvents),
