@@ -30,6 +30,7 @@ ml/evaluation/reports/*.txt
 # Large Raw & Processed Datasets (stored locally)
 data/raw/
 data/processed/
+data/cache/
 ml/datasets/*.csv
 
 

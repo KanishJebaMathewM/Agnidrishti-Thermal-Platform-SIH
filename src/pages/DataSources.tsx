@@ -205,7 +205,7 @@ export default function DataSources() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <span className="text-slate-600 font-bold">Data Sources Online</span>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">🟢 4/5</span>
+            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">🟢 5/5 Online</span>
           </div>
           <button className="text-teal-700 hover:text-teal-900 font-bold inline-flex items-center gap-1">
             <span>View Sync Logs</span>
