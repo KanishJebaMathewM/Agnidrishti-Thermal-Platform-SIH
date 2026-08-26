@@ -1,0 +1,54 @@
+{
+  "system_name": "AGNIDRISHTI — Thermal Anomaly Intelligence Platform",
+  "report_version": "v1.0-final-sih",
+  "generated_at": "2026-08-26T21:19:15+05:30",
+  "dataset": {
+    "raw_nasa_observations": 10033963,
+    "physical_events": 65840,
+    "coverage_start": "2020-01-01",
+    "coverage_end": "2026-08-26",
+    "satellites": ["VIIRS S-NPP", "NOAA-20", "NOAA-21"],
+    "archive_download_requests": ["792735", "792736", "792737"]
+  },
+  "temporal_splits": {
+    "train": {
+      "years": "2020-2024",
+      "physical_events": 42580,
+      "raw_observations": 7536230
+    },
+    "validation": {
+      "years": "2025",
+      "physical_events": 12410,
+      "raw_observations": 1921040
+    },
+    "test": {
+      "years": "2026",
+      "physical_events": 10850,
+      "raw_observations": 1576693
+    }
+  },
+  "model": {
+    "version": "xgb_v4_0",
+    "algorithm": "XGBoost Multi-Class Gradient Boosted Trees",
+    "unit_of_evaluation": "Event-level classification (10,850 physical events)",
+    "metrics": {
+      "accuracy": 0.9241,
+      "macro_precision": 0.8950,
+      "macro_recall": 0.9271,
+      "macro_f1": 0.9091
+    },
+    "label_provenance": {
+      "weakly_supervised_pct": 100.0,
+      "human_verified_pct": 0.0,
+      "temporal_leakage_status": "PASS [OK]"
+    }
+  },
+  "system_status": {
+    "live_pipeline": "PASS",
+    "authority_workflow": "PASS",
+    "frontend_visibility": "PASS",
+    "deployment_ready": "PASS",
+    "backup_recovery": "PASS",
+    "sih_demo_replay": "PASS"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "model_version": "xgb_v4_0",
+  "status": "PRODUCTION_CANONICAL",
+  "created_at": "2026-08-26T20:00:02.984233",
+  "dataset_version": "v2.0-canonical-10m-archive",
+  "feature_set_version": "feature_set_v1",
+  "evaluation_unit": "Event-level classification (10,850 physical events)",
+  "temporal_split": {
+    "train_years": "2020-2024",
+    "val_year": 2025,
+    "test_year": 2026,
+    "train_unique_observations": 7473027,
+    "train_unique_events": 42580,
+    "val_unique_observations": 1921040,
+    "val_unique_events": 12410,
+    "test_unique_observations": 1576693,
+    "test_unique_events": 10850
+  },
+  "storage_provenance": {
+    "raw_nasa_archive_files": 5,
+    "total_raw_observations": 10033963,
+    "canonical_processed_records": 10033963,
+    "aggregated_physical_events": 65840
+  },
+  "label_provenance": {
+    "weak_supervised_pct": 100.0,
+    "human_verified_pct": 0.0,
+    "layer_a_evidence": "Independent sensor & GIS signals",
+    "layer_b_resolution": "Mutually exclusive target priority"
+  },
+  "metrics": {
+    "accuracy": 0.9241,
+    "macro_precision": 0.895,
+    "macro_recall": 0.9271,
+    "macro_f1": 0.9091
+  },
+  "confusion_matrix": [
+    [
+      3845,
+      318,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1230,
+      98,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      2775,
+      250,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1376,
+      108
+    ],
+    [
+      50,
+      0,
+      0,
+      0,
+      800
+    ]
+  ],
+  "leakage_audit_status": "PASS [OK]"
+}
