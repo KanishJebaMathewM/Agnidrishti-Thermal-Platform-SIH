@@ -8,7 +8,7 @@ if sys.platform == "win32":
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import authorities, dashboard, events, feedback, health, model, notifications, sources
+from app.api.routes import authorities, dashboard, events, feedback, health, model, notifications, sources, system
 
 app = FastAPI(
     title="AGNIDRISHTI API",
@@ -31,4 +31,5 @@ app.include_router(authorities.router, prefix="/authorities", tags=["authorities
 app.include_router(feedback.router, tags=["feedback"])
 app.include_router(notifications.router, tags=["notifications"])
 app.include_router(model.router, prefix="/model", tags=["model"])
+app.include_router(system.router, prefix="/system", tags=["system"])
 app.include_router(health.router, tags=["health"])

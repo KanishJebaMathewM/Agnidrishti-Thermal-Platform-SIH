@@ -1,0 +1,15 @@
+{
+  "created_at": "2026-08-26T21:14:43.610607",
+  "backup_version": "v1.0-canonical-10m",
+  "artifacts_backed_up": [
+    "dataset_manifest.json",
+    "xgb_v4_0_metadata.json",
+    "DATASET_PRODUCT_RECONCILIATION.md",
+    "postgis_schema_ddl.sql"
+  ],
+  "system_counts": {
+    "raw_observations": 10033963,
+    "physical_events": 65840,
+    "model_version": "xgb_v4_0"
+  }
+}
