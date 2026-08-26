@@ -33,6 +33,8 @@ export interface ThermalEvent {
   current: number
   routedTo: Agency
   isAnomaly: boolean
+  /** Set by the analyst feedback actions in EventDetail once a backend/mock mutation lands. */
+  reviewerFeedback?: 'Confirmed' | 'False Alarm' | null
 }
 
 export interface RegistrySource {

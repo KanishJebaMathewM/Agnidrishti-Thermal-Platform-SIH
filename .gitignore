@@ -5,6 +5,14 @@ dist/
 .env.local
 .DS_Store
 
+# Personal Claude Code overrides (may contain secrets, e.g. MCP server API keys)
+.claude/settings.local.json
+
+# Personal Claude Code tooling (design skill, MCP config) — not part of the
+# application; not shared with the team via this repo
+.claude/skills/
+.mcp.json
+
 # Python (ml/, workers/, backend/)
 .venv/
 __pycache__/

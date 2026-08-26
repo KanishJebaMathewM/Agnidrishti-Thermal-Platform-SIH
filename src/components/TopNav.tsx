@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { Bell, ChevronDown, Eye, ListFilter, Archive, AlertTriangle, TrendingUp, Database, Cpu, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { pingApi } from '../api/client'
+import { formatDistanceToNow } from './Badges'
 
 const navItems = [
   { to: '/', label: 'Overview', icon: Eye },
@@ -15,6 +17,25 @@ const navItems = [
 export default function TopNav() {
   const [profileOpen, setProfileOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isLive, setIsLive] = useState(false)
+  const [lastSync, setLastSync] = useState<Date>(new Date())
+
+  useEffect(() => {
+    let isMounted = true
+    async function check() {
+      const ok = await pingApi()
+      if (isMounted) {
+        setIsLive(ok)
+        setLastSync(new Date())
+      }
+    }
+    check()
+    const interval = setInterval(check, 30000)
+    return () => {
+      isMounted = false
+      clearInterval(interval)
+    }
+  }, [])
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
@@ -34,8 +55,12 @@ export default function TopNav() {
             </div>
           </div>
 
-          {/* Desktop Navigation Tabs (Visible on XL screens and above: >= 1280px) */}
-          <nav className="hidden xl:flex items-center gap-1 2xl:gap-2 shrink-0">
+          {/* Desktop Navigation Tabs (Visible on XL screens and above: >= 1280px).
+              min-w-0 + overflow-x-auto let this strip shrink and internally
+              scroll instead of pushing the always-visible profile/bell
+              controls off the right edge of the viewport on narrower
+              (xl but not 2xl, e.g. 1280-1535px) laptop widths. */}
+          <nav className="hidden xl:flex items-center gap-1 2xl:gap-2 min-w-0 overflow-x-auto scrollbar-none">
             {navItems.map((item) => {
               const Icon = item.icon
               return (
@@ -44,7 +69,7 @@ export default function TopNav() {
                   to={item.to}
                   end={item.to === '/'}
                   className={({ isActive }) =>
-                    `relative inline-flex items-center gap-2 px-3 py-2 text-xs 2xl:text-sm font-semibold transition-all rounded-[14px] whitespace-nowrap ${
+                    `relative inline-flex items-center gap-1.5 2xl:gap-2 px-2 2xl:px-3 py-2 text-xs 2xl:text-sm font-semibold transition-all rounded-[14px] whitespace-nowrap shrink-0 ${
                       isActive
                         ? 'bg-[#E4F2F0] text-[#005A52]'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
@@ -65,16 +90,16 @@ export default function TopNav() {
             })}
           </nav>
 
-          {/* Right Status & Profile Controls */}
+          {/* Right Status & Profile Controls — never shrinks, always visible */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Live Sync Status - Visible on 2XL screens */}
             <div className="hidden 2xl:flex items-center gap-2 text-xs bg-slate-50 border border-slate-200/90 px-3 py-1.5 rounded-full shrink-0">
               <span className="relative flex w-2 h-2">
-                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
-                <span className="relative w-2 h-2 rounded-full bg-emerald-600" />
+                {isLive && <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />}
+                <span className={`relative w-2 h-2 rounded-full ${isLive ? 'bg-emerald-600' : 'bg-slate-400'}`} />
               </span>
               <span className="text-slate-600 font-medium font-mono text-[11px] whitespace-nowrap">
-                Live <span className="text-slate-300">·</span> Last sync 2m ago
+                {isLive ? 'Live' : 'Offline / Demo Mode'} <span className="text-slate-300">·</span> Last sync {formatDistanceToNow(lastSync)}
               </span>
             </div>
 
@@ -162,14 +187,14 @@ export default function TopNav() {
             <div className="mt-3 pt-3 border-t border-slate-100 px-4 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 <span className="relative flex w-2 h-2">
-                  <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
-                  <span className="relative w-2 h-2 rounded-full bg-emerald-600" />
+                  {isLive && <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />}
+                  <span className={`relative w-2 h-2 rounded-full ${isLive ? 'bg-emerald-600' : 'bg-slate-400'}`} />
                 </span>
                 <span className="text-slate-600 font-medium font-mono text-xs">
-                  Live System Sync Active
+                  {isLive ? 'Live System Sync Active' : 'Offline / Demo Mode'}
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 font-mono">2m ago</span>
+              <span className="text-[11px] text-slate-400 font-mono">{formatDistanceToNow(lastSync)}</span>
             </div>
           </div>
         )}

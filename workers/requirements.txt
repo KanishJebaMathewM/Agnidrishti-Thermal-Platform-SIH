@@ -1,0 +1,22 @@
+# Pins updated from the original CONTRIBUTOR_2 spec versions, which predate
+# Python 3.14 wheel support and fail to install on this environment. See
+# ml/requirements.txt for the same adjustment made in Contributor 3's work.
+celery==5.6.3
+redis==8.1.0
+sqlalchemy==2.0.52
+geoalchemy2==0.20.0
+psycopg[binary]==3.2.10
+pandas==3.0.5
+numpy==2.5.2
+geopandas==1.1.4
+shapely==2.1.2
+pyproj==3.7.2
+h3==4.5.0
+httpx==0.28.1
+python-dotenv==1.2.3
+pytest==9.1.1
+
+# Deferred: rasterio / netCDF4 (ISRO INSAT/MOSDAC raster ingestion is not yet
+# implemented in this contributor's scope — add when that work starts. Both
+# pull in GDAL and are the most likely to hit compiled-binary install issues
+# on this machine, so don't add them speculatively.

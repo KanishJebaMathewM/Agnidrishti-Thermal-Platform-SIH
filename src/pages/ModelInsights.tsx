@@ -93,7 +93,7 @@ export default function ModelInsights() {
         {statCards.map((s, idx) => {
           const Icon = s.icon
           return (
-            <div key={idx} className="card p-4.5 flex flex-col justify-between hover:border-slate-300 transition-all overflow-hidden">
+            <div key={idx} className="card p-4 flex flex-col justify-between hover:border-slate-300 transition-all overflow-hidden">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${s.iconBg}`}>

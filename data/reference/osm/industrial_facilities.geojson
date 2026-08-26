@@ -1,0 +1,61 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Jamnagar Refinery Zone",
+        "facility_type": "Refinery"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.0577,
+          22.2394
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vadodara Industrial Belt",
+        "facility_type": "Kiln"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.1812,
+          22.3072
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Angul Steel Hub",
+        "facility_type": "Steel Mill"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          85.1018,
+          20.8397
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Chennai Petrochemical Zone",
+        "facility_type": "Flare"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2707,
+          13.0827
+        ]
+      }
+    }
+  ]
+}
