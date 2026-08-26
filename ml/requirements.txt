@@ -1,0 +1,29 @@
+# ML pipeline requirements (Contributor 3 domain).
+#
+# NOTE ON VERSION PINS: the CONTRIBUTOR_3_ML_PIPELINE.md spec pins older
+# releases (xgboost==2.1.2, scikit-learn==1.5.2, pandas==2.2.3, numpy==2.1.2,
+# etc.). Those predate Python 3.14 wheel support and fail to install on a
+# 3.14 interpreter (numpy in particular falls back to a source build that
+# this environment's Application Control policy blocks). Pins below are
+# versions verified with `pip install --only-binary=:all:` on Python 3.14
+# in this environment (2026-08-25) — every one of them, including
+# geopandas/shapely/h3, installed as a prebuilt wheel with no compilation.
+# If your environment runs an older Python (3.11-3.12, as the master plan
+# recommends), the original spec pins also work fine — nothing in this
+# codebase depends on version-specific APIs beyond DataFrame ops,
+# XGBClassifier, IsolationForest, and joblib.dump/load.
+
+xgboost==3.4.1
+scikit-learn==1.9.0
+pandas==3.0.5
+numpy==2.5.2
+geopandas==1.1.4
+shapely==2.1.2
+h3==4.5.0
+joblib==1.5.3
+matplotlib==3.11.1
+seaborn==0.13.2
+pytest==9.1.1
+sqlalchemy==2.0.52
+psycopg[binary]==3.3.4
+celery==5.6.3

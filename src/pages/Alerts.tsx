@@ -1,12 +1,15 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Settings, ListFilter, Plus, MapPin, ExternalLink, MoreVertical,
   ChevronDown, Flame, TreePine, Building2, Bell, AlertTriangle, Leaf, HelpCircle,
-  Wind, Clock, CheckCircle2
+  Wind, Clock, CheckCircle2, AlertCircle
 } from 'lucide-react'
 import { ClassificationBadge, ConfidenceTag } from '../components/Badges'
-import { allEvents, type Agency, type Classification } from '../data/mockData'
+import LoadingSkeleton from '../components/shared/LoadingSkeleton'
+import { type Agency, type Classification } from '../data/mockData'
+import { useEventsList } from '../hooks/useEventsList'
+import { getAuthorities } from '../api/authoritiesApi'
 
 const routedAgencyDetails: Record<string, { agency: Agency; division: string; icon: any }> = {
   'Meerut Bricks Belt': { agency: 'Fire Services', division: 'Meerut Division', icon: Flame },
@@ -25,6 +28,16 @@ export default function Alerts() {
   const [classFilter, setClassFilter] = useState('all')
   const [stateFilter, setStateFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
+  const { events: allEvents, loading, error } = useEventsList()
+
+  const [agencies, setAgencies] = useState<Agency[]>([])
+  useEffect(() => {
+    let isMounted = true
+    getAuthorities().then((res) => isMounted && setAgencies(res))
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const alertsData = useMemo(() => {
     return allEvents.slice(0, 30).map((e, idx) => {
@@ -52,7 +65,7 @@ export default function Alerts() {
         eventId: e.id,
       }
     })
-  }, [])
+  }, [allEvents])
 
   const filteredAlerts = useMemo(() => {
     return alertsData.filter((a) => {
@@ -108,10 +121,9 @@ export default function Alerts() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <select value={agencyFilter} onChange={(e) => setAgencyFilter(e.target.value)} className="input text-xs font-medium">
             <option value="all">🏛️ All Agencies</option>
-            <option value="Fire Services">Fire Services</option>
-            <option value="CPCB">CPCB</option>
-            <option value="Forest Department">Forest Department</option>
-            <option value="State Aggregation">State Aggregation</option>
+            {agencies.map((a) => (
+              <option key={a} value={a}>{a}</option>
+            ))}
           </select>
 
           <select value={classFilter} onChange={(e) => setClassFilter(e.target.value)} className="input text-xs font-medium">
@@ -142,7 +154,19 @@ export default function Alerts() {
         </div>
       </div>
 
+      {error && (
+        <div className="card p-3.5 flex items-center gap-2.5 border-rose-200 bg-rose-50/60">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span className="text-xs font-semibold text-rose-800">{error} — showing offline/demo data.</span>
+        </div>
+      )}
+
       {/* Table Section */}
+      {loading ? (
+        <div className="card p-5">
+          <LoadingSkeleton rows={6} />
+        </div>
+      ) : (
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -332,6 +356,7 @@ export default function Alerts() {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }

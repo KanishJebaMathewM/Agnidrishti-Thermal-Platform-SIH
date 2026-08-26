@@ -2,10 +2,12 @@ import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
   Search, Download, Filter, Calendar, ChevronDown, Eye, BarChart2, MoreVertical,
-  TrendingUp, MapPin
+  TrendingUp, MapPin, AlertCircle
 } from 'lucide-react'
 import { ClassificationBadge, StatusBadge, ConfidenceTag, formatCoord } from '../components/Badges'
-import { allEvents, classificationHue, type Classification, type ThermalEvent } from '../data/mockData'
+import EmptyState from '../components/shared/EmptyState'
+import { classificationHue, type Classification } from '../data/mockData'
+import { useEventsList } from '../hooks/useEventsList'
 import EventDetail from '../components/EventDetail'
 
 type SortKey = 'timestamp' | 'confidence' | 'persistenceNights' | 'classification'
@@ -22,19 +24,17 @@ export default function Events() {
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const selectedEvent = useMemo(
-    () => allEvents.find((e) => e.id === selectedId) || null,
-    [selectedId],
-  )
+  const { events: allEvents, loading, error } = useEventsList({
+    classification: classFilter === 'all' ? undefined : classFilter,
+    status: statusFilter === 'all' ? undefined : statusFilter,
+    state: stateFilter === 'all' ? undefined : stateFilter,
+  })
 
-  const states = useMemo(() => [...new Set(allEvents.map((e) => e.state))].sort(), [])
+  const states = useMemo(() => [...new Set(allEvents.map((e) => e.state))].sort(), [allEvents])
 
   const filtered = useMemo(() => {
     let result = allEvents.filter((e) => {
       if (search && !e.placeName.toLowerCase().includes(search.toLowerCase()) && !e.id.toLowerCase().includes(search.toLowerCase())) return false
-      if (classFilter !== 'all' && e.classification !== classFilter) return false
-      if (statusFilter !== 'all' && e.status !== statusFilter) return false
-      if (stateFilter !== 'all' && e.state !== stateFilter) return false
       return true
     })
     result = [...result].sort((a, b) => {
@@ -46,7 +46,7 @@ export default function Events() {
       return sortDir === 'asc' ? cmp : -cmp
     })
     return result
-  }, [search, classFilter, statusFilter, stateFilter, sortKey, sortDir])
+  }, [allEvents, search, sortKey, sortDir])
 
   const paginatedEvents = useMemo(() => {
     const start = (currentPage - 1) * 10
@@ -77,8 +77,8 @@ export default function Events() {
           </div>
           <p className="text-xs sm:text-sm font-medium text-slate-500 mt-1">
             <span className="text-slate-800 font-semibold">{filtered.length} of {allEvents.length} detections matching current filters</span> ·{' '}
-            <span className="text-rose-600 font-bold">29 escalated as anomalous</span> ·{' '}
-            <span className="text-slate-600 font-medium">79 known sources suppressed</span>
+            <span className="text-rose-600 font-bold">{filtered.filter((e) => e.isAnomaly).length} escalated as anomalous</span> ·{' '}
+            <span className="text-slate-600 font-medium">{filtered.filter((e) => e.status === 'Suppressed').length} known sources suppressed</span>
           </p>
         </div>
 
@@ -166,7 +166,23 @@ export default function Events() {
         </div>
       </div>
 
+      {error && (
+        <div className="card p-3.5 flex items-center gap-2.5 border-rose-200 bg-rose-50/60">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span className="text-xs font-semibold text-rose-800">{error} — showing offline/demo data.</span>
+        </div>
+      )}
+
       {/* Events Table */}
+      {!loading && paginatedEvents.length === 0 ? (
+        <div className="card">
+          <EmptyState
+            title="No events match these filters"
+            message="Try clearing filters or adjusting your search."
+            action={{ label: 'Clear all filters', onClick: clearFilters }}
+          />
+        </div>
+      ) : (
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -303,8 +319,9 @@ export default function Events() {
           </div>
         </div>
       </div>
+      )}
 
-      {selectedEvent && <EventDetail event={selectedEvent} onClose={closeDetail} />}
+      {selectedId && <EventDetail eventId={selectedId} onClose={closeDetail} />}
     </div>
   )
 }

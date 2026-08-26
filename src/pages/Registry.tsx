@@ -1,10 +1,13 @@
 import { useState, useMemo } from 'react'
 import {
   Search, Plus, AlertTriangle, MapPin, Clock, Calendar, Eye, Edit3, MoreVertical,
-  Flame, Factory, Zap, Fuel
+  Flame, Factory, Zap, Fuel, AlertCircle
 } from 'lucide-react'
-import { registrySources, type RegistrySource } from '../data/mockData'
+import { type RegistrySource } from '../data/mockData'
 import { formatCoord, RegistryStatusBadge, RegistryTypeBadge } from '../components/Badges'
+import LoadingSkeleton from '../components/shared/LoadingSkeleton'
+import EmptyState from '../components/shared/EmptyState'
+import { useSourcesList } from '../hooks/useSourcesList'
 
 const typeIconMap = {
   Kiln: Factory,
@@ -26,8 +29,9 @@ export default function Registry() {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const { sources: registrySources, loading, error } = useSourcesList()
 
-  const types = useMemo(() => [...new Set(registrySources.map((s) => s.type))].sort(), [])
+  const types = useMemo(() => [...new Set(registrySources.map((s) => s.type))].sort(), [registrySources])
 
   const filtered = useMemo(() => {
     return registrySources.filter((s) => {
@@ -36,7 +40,7 @@ export default function Registry() {
       if (statusFilter !== 'all' && s.status !== statusFilter) return false
       return true
     })
-  }, [search, typeFilter, statusFilter])
+  }, [registrySources, search, typeFilter, statusFilter])
 
   const flaggedCount = registrySources.filter((s) => s.status === 'Flagged for Inspection').length
 
@@ -133,7 +137,22 @@ export default function Registry() {
         </div>
       </div>
 
-      {/* Registry Table */}
+      {error && (
+        <div className="card p-3.5 flex items-center gap-2.5 border-rose-200 bg-rose-50/60">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span className="text-xs font-semibold text-rose-800">{error} — showing offline/demo data.</span>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="card p-5">
+          <LoadingSkeleton rows={6} />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="card">
+          <EmptyState title="No sources match these filters" message="Try clearing filters or adjusting your search." />
+        </div>
+      ) : (
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -269,6 +288,7 @@ export default function Registry() {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }
