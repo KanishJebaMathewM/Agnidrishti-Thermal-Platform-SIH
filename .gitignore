@@ -27,6 +27,9 @@ ml/evaluation/reports/*.json
 ml/evaluation/reports/*.png
 ml/evaluation/reports/*.txt
 
-# Large Raw Datasets (stored locally in data/raw/)
+# Large Raw & Processed Datasets (stored locally)
 data/raw/
+data/processed/
+ml/datasets/*.csv
+
 

@@ -1,25 +1,63 @@
 {
-  "dataset_version": "v1.0-real-firms-materialized",
-  "created_at": "2026-08-26T18:59:00.461270",
-  "source": "NASA FIRMS Satellite Active Fire Observations",
-  "total_records": 25,
-  "train_records": 0,
-  "val_records": 0,
-  "test_records": 25,
-  "date_min": "2026-08-25",
-  "date_max": "2026-08-25",
-  "real_data_percentage": 100.0,
-  "synthetic_data_percentage": 0.0,
+  "dataset_version": "v2.0-canonical-10m-archive",
+  "created_at": "2026-08-26T19:57:28.469343",
+  "total_raw_processed": 10033963,
+  "total_canonical_records": 10033963,
+  "records_per_year": {
+    "2020": 984366,
+    "2021": 1536735,
+    "2022": 1198449,
+    "2023": 1170878,
+    "2024": 1645802,
+    "2025": 1921040,
+    "2026": 1576693
+  },
+  "file_manifests": [
+    {
+      "filename": "fire_archive_J1V-C2_792735.csv",
+      "sha256": "1cb942d75c7581dca3466708713488b2298f06cdb8318b5eff9fa0330d9c2b91",
+      "product_request_id": "792735",
+      "data_mode": "LIVE_ARCHIVE",
+      "raw_rows": 4216248,
+      "india_rows": 4216248
+    },
+    {
+      "filename": "fire_archive_SV-C2_792737.csv",
+      "sha256": "784ceddc6b323837d852483c644098beeb7da17a0558e9c329f9abe7f19a0072",
+      "product_request_id": "792737",
+      "data_mode": "LIVE_ARCHIVE",
+      "raw_rows": 4035933,
+      "india_rows": 4035933
+    },
+    {
+      "filename": "fire_nrt_J1V-C2_792735.csv",
+      "sha256": "3fdb2c4df3be53a148b4e192b901833d0f4aad4ca006371150e99160e70d315a",
+      "product_request_id": "792735",
+      "data_mode": "LIVE_NRT",
+      "raw_rows": 22353,
+      "india_rows": 22353
+    },
+    {
+      "filename": "fire_nrt_J2V-C2_792736.csv",
+      "sha256": "cd28d43958dd5a9c40513484589da0aed5a303a536f6ff90efde1d7d066bc5ed",
+      "product_request_id": "792736",
+      "data_mode": "LIVE_NRT",
+      "raw_rows": 1657332,
+      "india_rows": 1657332
+    },
+    {
+      "filename": "fire_nrt_SV-C2_792737.csv",
+      "sha256": "f6ba1ecb65ad94ae2c58867d325abfed8690b243f9b8b2ff5ac8f8c93b87f3a9",
+      "product_request_id": "792737",
+      "data_mode": "LIVE_NRT",
+      "raw_rows": 102097,
+      "india_rows": 102097
+    }
+  ],
   "storage_paths": {
-    "processed_dataset": "C:\\Users\\Admin\\Desktop\\Agnidrishti-Thermal-Platform-SIH-main\\data\\processed\\firms\\firms_india_2020_2026.csv",
-    "train_dataset": "C:\\Users\\Admin\\Desktop\\Agnidrishti-Thermal-Platform-SIH-main\\ml\\datasets\\train\\train_firms.csv",
-    "val_dataset": "C:\\Users\\Admin\\Desktop\\Agnidrishti-Thermal-Platform-SIH-main\\ml\\datasets\\val\\val_firms.csv",
-    "test_dataset": "C:\\Users\\Admin\\Desktop\\Agnidrishti-Thermal-Platform-SIH-main\\ml\\datasets\\test\\test_firms.csv"
+    "canonical_processed_csv": "data\\processed\\firms\\firms_india_2020_2026.csv"
   },
   "checksums": {
-    "processed_sha256": "4b453685cd988843775b6ef434f927838e139f4a6d8fe24cebdf34ae29a0209d",
-    "train_sha256": "45e10ee18718c850a108f069ed7dc47b0fd6913c773ef00da01793ab91e33ec5",
-    "val_sha256": "45e10ee18718c850a108f069ed7dc47b0fd6913c773ef00da01793ab91e33ec5",
-    "test_sha256": "4b453685cd988843775b6ef434f927838e139f4a6d8fe24cebdf34ae29a0209d"
+    "processed_sha256": "8d9ecec7293d3278ff32d1a0449d4e5146025e9e27ac11a7ad5dff53339e200e"
   }
 }
