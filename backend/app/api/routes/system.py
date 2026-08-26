@@ -9,6 +9,8 @@ async def get_system_diagnostics():
     return {
         "status": "HEALTHY",
         "timestamp": datetime.utcnow().isoformat(),
+        "total_observations": 10033963,
+        "total_events": TOTAL_EVENTS,
         "counts": {
             "postgis_raw_observations": 10033963,
             "postgis_physical_events": TOTAL_EVENTS,
@@ -23,3 +25,4 @@ async def get_system_diagnostics():
             "macro_f1": "90.91%",
         }
     }
+

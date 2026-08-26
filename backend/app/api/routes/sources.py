@@ -66,6 +66,12 @@ def source_summary(source) -> dict:
     }
 
 
+from app.services.canonical_source_provider import (
+    get_canonical_sources,
+    get_canonical_source_by_id,
+)
+
+
 @router.get("", response_model=dict)
 async def list_sources(
     page: int = Query(1, ge=1),
@@ -79,10 +85,22 @@ async def list_sources(
         if db:
             items, total = await source_repository.get_sources(db, limit, (page - 1) * limit, state, status, type)
             if items:
-                return {"items": [source_summary(item) for item in items], "total": total, "page": page, "pages": math.ceil(total / limit) if total else 0}
+                return {
+                    "items": [source_summary(item) for item in items],
+                    "total": total,
+                    "page": page,
+                    "pages": math.ceil(total / limit) if total else 0,
+                }
     except Exception:
         pass
-    return {"items": FALLBACK_SOURCES, "total": len(FALLBACK_SOURCES), "page": 1, "pages": 1}
+
+    items, total = get_canonical_sources(page=page, limit=limit, status=status, type_filter=type, state=state)
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "pages": math.ceil(total / limit) if total else 0,
+    }
 
 
 @router.get("/{source_id}", response_model=dict)
@@ -91,7 +109,31 @@ async def get_source(source_id: str, db: AsyncSession = Depends(get_db)):
         if db:
             source = await source_repository.get_source_by_id(db, uuid.UUID(source_id))
             if source:
-                return {**source_summary(source), **{key: getattr(source, key) for key in ("h3_cell", "observation_count", "first_seen", "last_seen", "mean_frp", "frp_std", "median_frp", "monthly_profile", "seasonal_profile", "typical_hours", "classification_confidence", "last_updated")}}
+                return {
+                    **source_summary(source),
+                    **{
+                        key: getattr(source, key)
+                        for key in (
+                            "h3_cell",
+                            "observation_count",
+                            "first_seen",
+                            "last_seen",
+                            "mean_frp",
+                            "frp_std",
+                            "median_frp",
+                            "monthly_profile",
+                            "seasonal_profile",
+                            "typical_hours",
+                            "classification_confidence",
+                            "last_updated",
+                        )
+                    },
+                }
     except Exception:
         pass
-    return FALLBACK_SOURCES[0]
+
+    src = get_canonical_source_by_id(source_id)
+    if src:
+        return src
+    items, _ = get_canonical_sources(page=1, limit=1)
+    return items[0] if items else {}

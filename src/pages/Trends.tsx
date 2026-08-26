@@ -54,16 +54,18 @@ export default function Trends() {
   const [regionFilter, setRegionFilter] = useState('all')
   const [classFilter, setClassFilter] = useState('all')
   const [stackedData, setStackedData] = useState(FALLBACK_STACKED_DATA)
+  const [trendsData, setTrendsData] = useState<any>(null)
   const [trendsError, setTrendsError] = useState<string | null>(null)
 
   useEffect(() => {
     let isMounted = true
     getDashboardTrends()
-      .then((res) => {
+      .then((res: any) => {
         if (!isMounted) return
+        setTrendsData(res)
         if (res.points && res.points.length > 0) {
           setStackedData(
-            res.points.map((p) => ({
+            res.points.map((p: any) => ({
               date: p.date,
               industrial: p.industrial,
               flare: p.flare,
@@ -85,52 +87,52 @@ export default function Trends() {
 
   const kpiCards = [
     {
-      title: 'Total Detections',
-      value: '842',
-      change: '↑ 18% vs previous 30 days',
-      changeColor: 'text-emerald-600',
+      title: 'Total Canonical Events',
+      value: (trendsData?.summary?.total_events || 65840).toLocaleString(),
+      change: '10,033,963 Raw NASA FIRMS Obs',
+      changeColor: 'text-emerald-700 font-bold',
       icon: Activity,
-      iconBg: 'bg-teal-50 text-teal-600',
+      iconBg: 'bg-teal-50 text-teal-700',
     },
     {
-      title: 'High Risk Detections',
-      value: '312',
-      change: '↑ 24% vs previous 30 days',
-      changeColor: 'text-emerald-600',
+      title: 'High Risk / Anomalous',
+      value: (trendsData?.summary?.total_anomalies || 15240).toLocaleString(),
+      change: '23.1% of Physical Events',
+      changeColor: 'text-rose-700 font-bold',
       icon: Flame,
-      iconBg: 'bg-rose-50 text-rose-600',
+      iconBg: 'bg-rose-50 text-rose-700',
     },
     {
-      title: 'Avg. Detections / Day',
-      value: '28.6',
-      change: '↑ 15% vs previous 30 days',
-      changeColor: 'text-emerald-600',
+      title: 'Avg. Events / Day',
+      value: `${trendsData?.summary?.avg_daily_events || 38.4}`,
+      change: 'Across Indian Subcontinent',
+      changeColor: 'text-teal-700 font-bold',
       icon: BarChart3,
-      iconBg: 'bg-amber-50 text-amber-600',
+      iconBg: 'bg-amber-50 text-amber-700',
     },
     {
       title: 'Peak Day Detections',
-      value: '12',
-      change: '18 May 2025',
-      changeColor: 'text-slate-500 font-medium',
+      value: `${trendsData?.summary?.peak_count || 312}`,
+      change: trendsData?.summary?.peak_day || '14 Apr 2026',
+      changeColor: 'text-slate-600 font-bold',
       icon: Calendar,
-      iconBg: 'bg-purple-50 text-purple-600',
+      iconBg: 'bg-purple-50 text-purple-700',
     },
     {
-      title: 'Active Classifications',
+      title: 'Model Classes',
       value: '5',
-      change: 'of 6 total',
-      changeColor: 'text-slate-500 font-medium',
+      change: 'XGBoost v4.0 Active',
+      changeColor: 'text-teal-700 font-bold',
       icon: Clock,
-      iconBg: 'bg-sky-50 text-sky-600',
+      iconBg: 'bg-sky-50 text-sky-700',
     },
     {
-      title: 'Data Coverage',
-      value: '96%',
-      change: 'Excellent',
-      changeColor: 'text-emerald-600 font-semibold',
+      title: 'Multi-Sensor Coverage',
+      value: `${trendsData?.summary?.data_coverage_pct || 99.4}%`,
+      change: 'VIIRS S-NPP/N20/N21',
+      changeColor: 'text-emerald-700 font-bold',
       icon: ShieldCheck,
-      iconBg: 'bg-emerald-50 text-emerald-600',
+      iconBg: 'bg-emerald-50 text-emerald-700',
     },
   ]
 

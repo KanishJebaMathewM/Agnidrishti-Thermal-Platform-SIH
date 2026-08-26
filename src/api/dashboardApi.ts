@@ -153,11 +153,39 @@ export async function getMapEvents(): Promise<{ events: ThermalEvent[] }> {
   return { events: page.items }
 }
 
-export async function getDashboardTrends(): Promise<{ points: TrendPoint[] }> {
-  try {
-    const res = await fetchApi<{ points: TrendPoint[] }>('/dashboard/trends')
-    return res.points && res.points.length > 0 ? res : { points: trendData }
-  } catch {
-    return { points: trendData }
+export interface TrendsResponse {
+  summary: {
+    total_events: number
+    total_observations: number
+    total_anomalies: number
+    avg_daily_events: number
+    peak_day: string
+    peak_count: number
+    data_coverage_pct: number
   }
+  yearly: Array<{
+    year: string
+    events: number
+    observations: number
+    anomalies: number
+  }>
+  monthly_2026: Array<{
+    month: string
+    events: number
+    industrial: number
+    flare: number
+    agri: number
+    forest: number
+    unknown: number
+  }>
+  state_anomalies: Array<{
+    state: string
+    pct: number
+  }>
+  points: TrendPoint[]
 }
+
+export async function getDashboardTrends(): Promise<TrendsResponse> {
+  return await fetchApi<TrendsResponse>('/dashboard/trends')
+}
+
