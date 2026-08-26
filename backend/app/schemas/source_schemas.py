@@ -1,6 +1,5 @@
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, Dict, Any, List
-import uuid
 from datetime import datetime
 
 class SourceBase(BaseModel):

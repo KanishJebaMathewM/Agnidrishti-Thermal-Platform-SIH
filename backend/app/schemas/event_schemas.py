@@ -1,7 +1,6 @@
 from pydantic import BaseModel, ConfigDict, model_validator
 from datetime import datetime, timezone
-import uuid
-from typing import Optional, List
+from typing import Optional
 
 class EventSummary(BaseModel):
     id: str

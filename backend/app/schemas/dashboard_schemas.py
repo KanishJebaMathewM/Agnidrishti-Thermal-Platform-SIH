@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Dict, Any, Optional
+from typing import List
 from app.schemas.event_schemas import EventSummary
 
 class ClassificationDistItem(BaseModel):

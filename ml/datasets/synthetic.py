@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import random
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from ml.features.feature_columns import CLASS_LABELS
 

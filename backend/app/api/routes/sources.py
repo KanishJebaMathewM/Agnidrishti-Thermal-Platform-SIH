@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories import source_repository
 from app.schemas.observation_schemas import ObservationDetail
-from app.schemas.source_schemas import SourceDetail, SourceSummary
+from app.schemas.source_schemas import SourceDetail
 from app.utils.database import get_db
 
 router = APIRouter()

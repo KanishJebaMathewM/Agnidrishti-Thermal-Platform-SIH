@@ -35,12 +35,11 @@ with a query against `observations` joined to `thermal_sources`,
 """
 from __future__ import annotations
 
-from datetime import datetime, date
 
 import pandas as pd
 
 from ml.features.feature_builder import build_feature_vector, _coerce_timestamp
-from ml.features.feature_columns import FEATURE_COLUMNS_V1, CLASS_LABELS
+from ml.features.feature_columns import FEATURE_COLUMNS_V1
 
 FOREST_SEASON_MONTHS = (3, 4, 5, 10, 11)
 AGRICULTURAL_SEASON_MONTHS = (10, 11, 4, 5)

@@ -31,7 +31,8 @@ async def save_feedback(db, event, reviewer, comment, label):
 @router.post("/events/{event_id}/confirm")
 async def confirm(event_id: uuid.UUID, payload: ReviewPayload, db: AsyncSession = Depends(get_db)):
     event = await get_event_by_id(db, event_id)
-    if not event: raise HTTPException(404, "Event not found")
+    if not event:
+        raise HTTPException(404, "Event not found")
     await update_event_status(db, event_id, "CONFIRMED")
     return await save_feedback(db, event, payload.reviewer, payload.comment, event.classification)
 
@@ -39,7 +40,8 @@ async def confirm(event_id: uuid.UUID, payload: ReviewPayload, db: AsyncSession 
 @router.post("/events/{event_id}/false-alarm")
 async def false_alarm(event_id: uuid.UUID, payload: ReviewPayload, db: AsyncSession = Depends(get_db)):
     event = await get_event_by_id(db, event_id)
-    if not event: raise HTTPException(404, "Event not found")
+    if not event:
+        raise HTTPException(404, "Event not found")
     await update_event_status(db, event_id, "FALSE_ALARM")
     return await save_feedback(db, event, payload.reviewer, payload.comment, "FALSE_ALARM")
 
@@ -47,6 +49,7 @@ async def false_alarm(event_id: uuid.UUID, payload: ReviewPayload, db: AsyncSess
 @router.post("/events/{event_id}/reclassify")
 async def reclassify(event_id: uuid.UUID, payload: ReclassifyPayload, db: AsyncSession = Depends(get_db)):
     event = await get_event_by_id(db, event_id)
-    if not event: raise HTTPException(404, "Event not found")
+    if not event:
+        raise HTTPException(404, "Event not found")
     await update_event_classification(db, event_id, payload.new_classification, "RECLASSIFIED")
     return await save_feedback(db, event, payload.reviewer, payload.comment, payload.new_classification)

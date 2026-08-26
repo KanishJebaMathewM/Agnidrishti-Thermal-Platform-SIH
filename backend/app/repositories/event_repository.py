@@ -6,7 +6,6 @@ from typing import List, Optional, Tuple, Dict, Any
 
 from app.models.event import Event, event_observations
 from app.models.observation import Observation
-from app.models.thermal_source import ThermalSource
 
 async def get_events(
     db: AsyncSession,

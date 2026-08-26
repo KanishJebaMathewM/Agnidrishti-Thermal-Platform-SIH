@@ -1,0 +1,15 @@
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+# Ruff's own traditional conservative default (pyflakes + pycodestyle errors +
+# syntax errors) — catches real bugs (unused imports, undefined names) without
+# opinionated style plugins like flake8-blind-except, which would flag this
+# codebase's deliberate broad `except Exception` fault-tolerance in pipeline
+# workers (e.g. per-chunk backfill resilience, Celery-task fallback paths).
+select = ["E4", "E7", "E9", "F"]
+# E712 (`== True`/`== False`) is a false positive on SQLAlchemy 2.x query
+# expressions: `Model.column == True` builds a SQL WHERE clause and cannot be
+# rewritten as a bare `Model.column` truthiness check, unlike normal Python.
+ignore = ["E712"]
