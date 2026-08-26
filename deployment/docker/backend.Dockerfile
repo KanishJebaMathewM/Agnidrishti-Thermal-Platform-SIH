@@ -1,20 +1,37 @@
 FROM python:3.11-slim
 
-# Install system dependencies for psycopg, postgis, etc.
+# Same system deps as worker.Dockerfile: backend/app/api/routes/model.py now
+# imports workers.inference.inference_worker, which imports ml/ at module
+# level (geopandas/shapely/h3 need GDAL/PROJ; xgboost/scikit-learn need none
+# of these, but installing alongside the rest is simplest and matches worker).
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     curl \
+    libproj-dev \
+    gdal-bin \
+    libgdal-dev \
+    libnetcdf-dev \
+    libhdf5-dev \
     && rm -rf /var/lib/apt/lists/*
+
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
 
 WORKDIR /app
 
-# Copy requirements and install
-COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy requirements and install. backend/app/api/routes/model.py imports
+# workers.inference.inference_worker (ml/ + workers/ requirements needed too).
+COPY backend/requirements.txt ./backend-requirements.txt
+COPY workers/requirements.txt ./workers-requirements.txt
+COPY ml/requirements.txt ./ml-requirements.txt
+RUN pip install --no-cache-dir -r backend-requirements.txt -r workers-requirements.txt -r ml-requirements.txt
 
-# Copy the rest of the application
+# Copy the application, plus workers/ and ml/ (imported by
+# backend/app/api/routes/model.py via workers.inference.inference_worker).
 COPY backend/ .
+COPY workers/ /app/workers/
+COPY ml/ /app/ml/
 
 EXPOSE 8000
 

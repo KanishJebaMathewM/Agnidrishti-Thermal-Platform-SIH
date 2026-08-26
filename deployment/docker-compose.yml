@@ -60,6 +60,7 @@ services:
       POSTGRES_DB: agnidrishti
       POSTGRES_USER: agnidrishti
       POSTGRES_PASSWORD: changeme
+      DATABASE_URL: postgresql+psycopg://agnidrishti:changeme@postgres:5432/agnidrishti
       REDIS_URL: redis://redis:6379/0
     command: celery -A celery_app worker --loglevel=info
 

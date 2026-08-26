@@ -23,7 +23,7 @@ async def _query_authorities(db: Any, state: str, district: str, types: tuple[st
             """
             SELECT id, state, district, authority_type, department, role,
                    official_email, official_phone, portal_url, active,
-                   verified_on, source_url
+                   verified_on, source_url, created_at, updated_at
             FROM authorities
             WHERE state = :state AND district = :district
               AND authority_type = ANY(:authority_types)

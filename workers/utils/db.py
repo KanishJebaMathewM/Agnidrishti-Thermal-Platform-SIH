@@ -1,22 +1,38 @@
 """
 Persistence layer for the data pipeline.
 
-Contributor 1's Postgres/PostGIS database does not exist yet in this environment
-(no `backend/app/models/observation.py`, no migrations). To keep this contributor's
-work fully testable offline — and swappable for the real thing later without
-touching pipeline logic — all workers depend on the `ObservationStore` interface
-below rather than talking to SQLAlchemy directly. `InMemoryObservationStore` is the
-default; `SQLAlchemyObservationStore` is the real implementation for Contributor 1
-to wire up once the `observations` table exists.
+Workers depend on the `ObservationStore` interface below rather than talking to
+SQLAlchemy directly, so pipeline logic stays testable offline regardless of
+which store backs it. `InMemoryObservationStore` is the default (tests, local
+dev without a DB); `SQLAlchemyObservationStore` is the real implementation,
+backed by Contributor 1's `observations` table.
 """
 from __future__ import annotations
 
 import os
 from typing import Protocol
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", "postgresql+psycopg://agnidrishti:changeme@localhost/agnidrishti"
-)
+
+def _default_database_url() -> str:
+    """
+    Prefer an explicit DATABASE_URL. Otherwise assemble one from the same
+    POSTGRES_* parts backend/app/config.py's Settings uses — this is what the
+    worker Celery container actually gets from docker-compose.yml (it sets
+    POSTGRES_HOST/PORT/DB/USER/PASSWORD, not DATABASE_URL directly), so both
+    services resolve to the same database without extra compose wiring.
+    """
+    explicit = os.getenv("DATABASE_URL")
+    if explicit:
+        return explicit
+    host = os.getenv("POSTGRES_HOST", "localhost")
+    port = os.getenv("POSTGRES_PORT", "5432")
+    db = os.getenv("POSTGRES_DB", "agnidrishti")
+    user = os.getenv("POSTGRES_USER", "agnidrishti")
+    password = os.getenv("POSTGRES_PASSWORD", "changeme")
+    return f"postgresql+psycopg://{user}:{password}@{host}:{port}/{db}"
+
+
+DATABASE_URL = _default_database_url()
 
 _engine = None
 _SessionLocal = None

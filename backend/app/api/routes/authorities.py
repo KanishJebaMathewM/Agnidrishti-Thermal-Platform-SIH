@@ -5,8 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories import authority_repository
 from app.schemas.authority_schemas import AuthorityCreate, AuthorityDetail, AuthorityUpdate, RoutingResult
-from app.services.jurisdiction_service import resolve_jurisdiction
-from app.services.routing_service import resolve_route
+from app.services.routing_service import resolve_alert_route
 from app.utils.database import get_db
 
 router = APIRouter()
@@ -21,10 +20,15 @@ async def list_authorities(state: str | None = None, district: str | None = None
 @router.get("/routing/resolve", response_model=RoutingResult)
 async def routing_resolve(lat: float = Query(..., ge=-90, le=90), lon: float = Query(..., ge=-180, le=180),
                           classification: str = Query(...), severity: str | None = None, db: AsyncSession = Depends(get_db)):
-    state, district = await resolve_jurisdiction(db, lat, lon)
-    if not state or not district:
-        return RoutingResult(state="Unknown", district="Unknown")
-    return await resolve_route(db, state, district, classification)
+    route = await resolve_alert_route(db, lat, lon, classification, severity or "UNKNOWN")
+    jurisdiction = route["jurisdiction"]
+    return RoutingResult(
+        state=jurisdiction["state_name"],
+        district=jurisdiction["district_name"],
+        routing_profile=route["routing_rule_matched"],
+        primary_authority=route["primary_authority"],
+        secondary_authorities=route["secondary_authorities"],
+    )
 
 
 @router.get("/{authority_id}", response_model=AuthorityDetail)

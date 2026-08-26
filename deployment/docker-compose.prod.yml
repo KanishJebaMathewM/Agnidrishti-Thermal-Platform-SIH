@@ -31,7 +31,7 @@ services:
   backend:
     build:
       context: ..
-      dockerfile: backend/Dockerfile
+      dockerfile: deployment/docker/backend.Dockerfile
     restart: always
     env_file: ../.env
     expose: ["8000"]
@@ -46,7 +46,7 @@ services:
   worker:
     build:
       context: ..
-      dockerfile: workers/Dockerfile
+      dockerfile: deployment/docker/worker.Dockerfile
     restart: always
     env_file: ../.env
     networks: [internal]
