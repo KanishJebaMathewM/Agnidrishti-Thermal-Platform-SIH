@@ -1,0 +1,66 @@
+{
+  "dataset_version": "v1.0-real-firms",
+  "created_at": "2026-08-26T18:49:15Z",
+  "source_products": [
+    "VIIRS_SNPP_SP",
+    "VIIRS_NOAA20_SP",
+    "MODIS_SP",
+    "VIIRS_SNPP_NRT"
+  ],
+  "total_rows": 2233,
+  "train_rows": 1340,
+  "validation_rows": 305,
+  "test_rows": 588,
+  "date_min": "2020-01-01",
+  "date_max": "2026-08-26",
+  "train_date_range": "2020-01-01 to 2024-12-31",
+  "validation_date_range": "2025-01-01 to 2025-12-31",
+  "test_date_range": "2026-01-01 to 2026-08-26",
+  "real_data_percentage": 100.0,
+  "synthetic_data_percentage": 0.0,
+  "weak_label_percentage": 100.0,
+  "human_verified_percentage": 0.0,
+  "feature_set_version": "feature_set_v1",
+  "label_version": "2_layer_mutually_exclusive_v1",
+  "splits": {
+    "train": {
+      "row_count": 1340,
+      "unique_observations": 1340,
+      "unique_events": 352,
+      "unique_sources": 18,
+      "class_distribution": {
+        "industrial_fire": 478,
+        "persistent_flare_or_kiln": 148,
+        "agricultural_burn": 422,
+        "forest_fire": 182,
+        "unknown": 110
+      }
+    },
+    "validation": {
+      "row_count": 305,
+      "unique_observations": 305,
+      "unique_events": 80,
+      "unique_sources": 12,
+      "class_distribution": {
+        "industrial_fire": 109,
+        "persistent_flare_or_kiln": 34,
+        "agricultural_burn": 96,
+        "forest_fire": 41,
+        "unknown": 25
+      }
+    },
+    "test": {
+      "row_count": 588,
+      "unique_observations": 588,
+      "unique_events": 588,
+      "unique_sources": 25,
+      "class_distribution": {
+        "industrial_fire": 210,
+        "persistent_flare_or_kiln": 65,
+        "agricultural_burn": 185,
+        "forest_fire": 80,
+        "unknown": 48
+      }
+    }
+  }
+}
