@@ -1,15 +1,16 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Activity, Flame, BarChart3, Calendar, Clock, ShieldCheck, Download, Filter,
-  Info, ChevronDown, Lightbulb
+  Info, ChevronDown, Lightbulb, AlertCircle
 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar
 } from 'recharts'
 import { classificationHue } from '../data/mockData'
+import { getDashboardTrends } from '../api/dashboardApi'
 
-const stackedData = [
+const FALLBACK_STACKED_DATA = [
   { date: '23 Apr', industrial: 12, flare: 14, agri: 13, forest: 7, unknown: 6 },
   { date: '27 Apr', industrial: 11, flare: 12, agri: 10, forest: 6, unknown: 5 },
   { date: '01 May', industrial: 15, flare: 18, agri: 18, forest: 10, unknown: 8 },
@@ -52,6 +53,31 @@ const seasonalAgri = [
 export default function Trends() {
   const [regionFilter, setRegionFilter] = useState('all')
   const [classFilter, setClassFilter] = useState('all')
+  const [stackedData, setStackedData] = useState(FALLBACK_STACKED_DATA)
+  const [trendsError, setTrendsError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+    getDashboardTrends()
+      .then((res) => {
+        if (!isMounted) return
+        setStackedData(
+          res.points.map((p) => ({
+            date: p.date,
+            industrial: p.industrial,
+            flare: p.flare,
+            agri: p.agricultural,
+            forest: p.forest,
+            unknown: p.unknown,
+          })),
+        )
+        setTrendsError(null)
+      })
+      .catch((err) => isMounted && setTrendsError(err.message))
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const kpiCards = [
     {
@@ -163,7 +189,7 @@ export default function Trends() {
             <div key={idx} className="card p-4 flex flex-col justify-between hover:border-slate-300 transition-all">
               <div className="flex items-start gap-3">
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${c.iconBg}`}>
-                  <Icon className="w-4.5 h-4.5" />
+                  <Icon className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="text-2xl font-extrabold text-slate-900 tracking-tight">{c.value}</div>
@@ -194,6 +220,13 @@ export default function Trends() {
             </button>
           </div>
         </div>
+
+        {trendsError && (
+          <div className="flex items-center gap-2 text-[11px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2.5 py-1.5 mb-2">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            <span>{trendsError} — showing offline/demo data.</span>
+          </div>
+        )}
 
         <div className="h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">

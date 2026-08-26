@@ -59,6 +59,16 @@
   }
 }
 
+/* Hides the scrollbar on an internally-scrollable strip (e.g. the top nav
+   between the xl and 2xl breakpoints) while keeping it scrollable. */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

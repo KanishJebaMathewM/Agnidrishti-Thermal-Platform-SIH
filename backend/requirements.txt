@@ -1,0 +1,22 @@
+# Pins updated from the original CONTRIBUTOR_1 spec versions, which predate
+# Python 3.14 wheel support and fail to install on this environment (same
+# issue already hit and fixed in ml/requirements.txt and workers/requirements.txt).
+# These versions were verified with `pip install --only-binary=:all:` on
+# Python 3.14. CI runs Python 3.11, where the original spec pins also work —
+# nothing here depends on version-specific APIs beyond FastAPI routing,
+# SQLAlchemy 2.x mapped_column syntax, and Pydantic v2 models.
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+sqlalchemy==2.0.52
+alembic==1.19.1
+geoalchemy2==0.20.0
+psycopg[binary]==3.3.4
+pydantic==2.13.4
+pydantic-settings==2.15.0
+redis==8.1.0
+celery==5.6.3
+httpx==0.28.1
+python-dotenv==1.2.3
+pytest==9.1.1
+pytest-asyncio==1.4.0
+pyyaml==6.0.3

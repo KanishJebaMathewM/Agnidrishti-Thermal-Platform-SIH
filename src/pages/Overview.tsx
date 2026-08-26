@@ -2,23 +2,23 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Flame, ShieldCheck, AlertTriangle, Clock, Shield, ArrowRight,
-  Info, Calendar, ChevronDown
+  Info, Calendar, ChevronDown, AlertCircle
 } from 'lucide-react'
 import { ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts'
 import IndiaMap from '../components/IndiaMap'
-import { ConfidenceTag } from '../components/Badges'
-import {
-  allEvents, recentEvents, classificationDistributionData, riskLevelSummaryData,
-  trendData
-} from '../data/mockData'
+import { ConfidenceTag, formatDistanceToNow } from '../components/Badges'
+import { KpiCardSkeleton } from '../components/shared/LoadingSkeleton'
+import { useDashboardData } from '../hooks/useDashboardData'
+import { trendData } from '../data/mockData'
 
 export default function Overview() {
   const navigate = useNavigate()
   const [showOnlyAnomalies, setShowOnlyAnomalies] = useState(false)
+  const { data: summary, mapEvents: liveMapEvents, loading, error, lastSync } = useDashboardData()
 
   const mapEvents = useMemo(
-    () => (showOnlyAnomalies ? allEvents.filter((e) => e.isAnomaly) : allEvents),
-    [showOnlyAnomalies],
+    () => (showOnlyAnomalies ? liveMapEvents.filter((e) => e.isAnomaly) : liveMapEvents),
+    [showOnlyAnomalies, liveMapEvents],
   )
 
   // Sparkline generator helper data
@@ -30,10 +30,12 @@ export default function Overview() {
     highRisk: [2, 3, 2, 4, 3, 5, 4, 6, 5, 7, 5, 6],
   }
 
+  const suppressedCount = summary ? summary.total_events_24h - summary.anomaly_events_24h : 0
+
   const kpiCards = [
     {
       title: 'Total Detections Today',
-      value: '120',
+      value: summary ? String(summary.total_events_24h) : '—',
       change: '↑ 18% vs yesterday',
       changeColor: 'text-emerald-600',
       icon: Flame,
@@ -44,7 +46,7 @@ export default function Overview() {
     },
     {
       title: 'Suppressed (Known/Expected)',
-      value: '79',
+      value: summary ? String(suppressedCount) : '—',
       change: '↑ 11% vs yesterday',
       changeColor: 'text-emerald-600',
       icon: ShieldCheck,
@@ -55,7 +57,7 @@ export default function Overview() {
     },
     {
       title: 'Escalated (Anomalous)',
-      value: '29',
+      value: summary ? String(summary.anomaly_events_24h) : '—',
       change: '↑ 32% vs yesterday',
       changeColor: 'text-rose-600',
       icon: AlertTriangle,
@@ -65,8 +67,8 @@ export default function Overview() {
       sparkline: sparklines.escalated,
     },
     {
-      title: 'Pending Agency Response',
-      value: '24',
+      title: 'Active Thermal Sources',
+      value: summary ? String(summary.active_sources) : '—',
       change: '↓ 5% vs yesterday',
       changeColor: 'text-emerald-600',
       icon: Clock,
@@ -77,7 +79,7 @@ export default function Overview() {
     },
     {
       title: 'Active High-Risk Events',
-      value: '6',
+      value: summary ? String(summary.critical_events) : '—',
       change: '↑ 2 vs yesterday',
       changeColor: 'text-purple-600',
       icon: Shield,
@@ -95,9 +97,15 @@ export default function Overview() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">National Thermal Anomaly Overview</h1>
           <p className="text-sm font-medium text-slate-500 mt-1">
-            <span className="text-slate-800 font-semibold">120 detections processed today</span> ·{' '}
-            <span className="text-rose-600 font-bold">29 escalated as anomalous</span> ·{' '}
-            <span className="text-slate-600 font-medium">79 known sources suppressed</span>
+            {summary ? (
+              <>
+                <span className="text-slate-800 font-semibold">{summary.total_events_24h} detections processed today</span> ·{' '}
+                <span className="text-rose-600 font-bold">{summary.anomaly_events_24h} escalated as anomalous</span> ·{' '}
+                <span className="text-slate-600 font-medium">{suppressedCount} known sources suppressed</span>
+              </>
+            ) : (
+              <span className="text-slate-400">Loading detection summary…</span>
+            )}
           </p>
         </div>
 
@@ -121,9 +129,19 @@ export default function Overview() {
         </div>
       </div>
 
+      {/* Error banner */}
+      {error && (
+        <div className="card p-3.5 flex items-center gap-2.5 border-rose-200 bg-rose-50/60">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span className="text-xs font-semibold text-rose-800">{error} — showing offline/demo data.</span>
+        </div>
+      )}
+
       {/* 5 KPI Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        {kpiCards.map((card, idx) => {
+        {loading && !summary
+          ? Array.from({ length: 5 }, (_, i) => <KpiCardSkeleton key={i} />)
+          : kpiCards.map((card, idx) => {
           const Icon = card.icon
           const chartData = card.sparkline.map((v, i) => ({ i, v }))
           return (
@@ -187,7 +205,7 @@ export default function Overview() {
           </div>
 
           <div className="divide-y divide-slate-100 overflow-y-auto flex-1 max-h-[460px]">
-            {recentEvents.map((e, idx) => (
+            {(summary?.recent_events ?? []).map((e, idx) => (
               <div
                 key={idx}
                 onClick={() => navigate(`/events?selected=${e.id}`)}
@@ -321,7 +339,7 @@ export default function Overview() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={classificationDistributionData}
+                    data={summary?.classification_distribution ?? []}
                     cx="50%"
                     cy="50%"
                     innerRadius={32}
@@ -329,21 +347,21 @@ export default function Overview() {
                     paddingAngle={2}
                     dataKey="value"
                   >
-                    {classificationDistributionData.map((entry, index) => (
+                    {(summary?.classification_distribution ?? []).map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="font-extrabold text-slate-900 text-sm">120</span>
+                <span className="font-extrabold text-slate-900 text-sm">{summary?.total_events_24h ?? '—'}</span>
                 <span className="text-[9px] text-slate-500 font-semibold">Total</span>
               </div>
             </div>
 
             {/* Legend list */}
             <div className="flex-1 space-y-1 text-[11px]">
-              {classificationDistributionData.map((item) => (
+              {(summary?.classification_distribution ?? []).map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
@@ -368,7 +386,7 @@ export default function Overview() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={riskLevelSummaryData}
+                    data={summary?.risk_level_summary ?? []}
                     cx="50%"
                     cy="50%"
                     innerRadius={32}
@@ -376,21 +394,25 @@ export default function Overview() {
                     paddingAngle={2}
                     dataKey="count"
                   >
-                    {riskLevelSummaryData.map((entry, index) => (
+                    {(summary?.risk_level_summary ?? []).map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="font-extrabold text-slate-900 text-xs">33%</span>
+                <span className="font-extrabold text-slate-900 text-xs">
+                  {summary && summary.total_events_24h > 0
+                    ? `${Math.round((summary.critical_events / summary.total_events_24h) * 100)}%`
+                    : '—'}
+                </span>
                 <span className="text-[9px] text-slate-500 font-semibold">High Risk</span>
               </div>
             </div>
 
             {/* Legend list */}
             <div className="flex-1 space-y-1 text-[11px]">
-              {riskLevelSummaryData.map((item) => (
+              {(summary?.risk_level_summary ?? []).map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
@@ -413,7 +435,7 @@ export default function Overview() {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 text-xs text-slate-500 font-medium border-t border-slate-200/80">
         <div className="flex items-center gap-1.5">
           <Clock className="w-3.5 h-3.5 text-slate-400" />
-          <span>Last Updated: 24 May 2025, 10:32 AM IST</span>
+          <span>Last sync {formatDistanceToNow(lastSync)}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Info className="w-3.5 h-3.5 text-slate-400" />
