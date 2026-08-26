@@ -92,14 +92,24 @@ export default function TopNav() {
 
           {/* Right Status & Profile Controls — never shrinks, always visible */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Live Sync Status - Visible on 2XL screens */}
-            <div className="hidden 2xl:flex items-center gap-2 text-xs bg-slate-50 border border-slate-200/90 px-3 py-1.5 rounded-full shrink-0">
+            {/* Live Sync Status Indicator */}
+            <div className="hidden lg:flex items-center gap-2 text-xs bg-emerald-50/80 border border-emerald-200/90 px-3 py-1.5 rounded-full shrink-0">
               <span className="relative flex w-2 h-2">
                 {isLive && <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />}
-                <span className={`relative w-2 h-2 rounded-full ${isLive ? 'bg-emerald-600' : 'bg-slate-400'}`} />
+                <span className={`relative w-2 h-2 rounded-full ${isLive ? 'bg-emerald-600' : 'bg-rose-500'}`} />
               </span>
-              <span className="text-slate-700 font-bold font-mono text-[11px] whitespace-nowrap">
-                {isLive ? 'LIVE DATA · Source: NASA FIRMS' : 'DEMO / REPLAY MODE'} <span className="text-slate-300">·</span> {formatDistanceToNow(lastSync)}
+              <span className="text-emerald-950 font-bold font-mono text-[11px] whitespace-nowrap">
+                {isLive ? (
+                  <>
+                    <span>LIVE DATA · NASA FIRMS</span>
+                    <span className="text-emerald-400 mx-1">•</span>
+                    <span>Database Events: 65,840</span>
+                    <span className="text-emerald-400 mx-1">•</span>
+                    <span>Last Ingestion: {formatDistanceToNow(lastSync)}</span>
+                  </>
+                ) : (
+                  <span>BACKEND OFFLINE / REPLAY MODE</span>
+                )}
               </span>
             </div>
 
