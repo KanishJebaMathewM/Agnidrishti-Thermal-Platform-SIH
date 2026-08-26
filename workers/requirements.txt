@@ -5,7 +5,11 @@ celery==5.6.3
 redis==8.1.0
 sqlalchemy==2.0.52
 geoalchemy2==0.20.0
-psycopg[binary]==3.2.10
+# Matches backend/requirements.txt and ml/requirements.txt: this file is
+# co-installed with both in the worker/backend Docker images (celery_app.py
+# registers ML inference tasks), so all three must agree on psycopg's version
+# or pip's resolver fails with ResolutionImpossible.
+psycopg[binary]==3.3.4
 pandas==3.0.5
 numpy==2.5.2
 geopandas==1.1.4

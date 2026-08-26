@@ -13,7 +13,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          # 3.14, not the original spec's 3.11: ml/requirements.txt and
+          # workers/requirements.txt are pinned to versions verified on 3.14
+          # (numpy==2.5.2 in particular has dropped 3.11 support entirely —
+          # discovered via a real `docker build` failure, not just inspection).
+          # README.md's stated prerequisite is "Python 3.11+", so this still
+          # satisfies it. deployment/docker/{backend,worker}.Dockerfile match.
+          python-version: '3.14'
       # backend/app/api/routes/model.py imports workers.inference.inference_worker,
       # which imports ml/ at module level — and workers/tests + ml/tests are their
       # own contributor domains — so all three requirements files are needed here,

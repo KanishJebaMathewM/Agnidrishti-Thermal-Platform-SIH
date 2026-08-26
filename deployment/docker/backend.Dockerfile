@@ -1,4 +1,8 @@
-FROM python:3.11-slim
+# 3.14, not the spec's original 3.11 — see worker.Dockerfile: this image
+# installs the same ml/workers requirements, pinned to versions that dropped
+# 3.11 support (numpy==2.5.2 in particular). README.md's stated prerequisite
+# is "Python 3.11+", so 3.14 still satisfies it.
+FROM python:3.14-slim
 
 # Same system deps as worker.Dockerfile: backend/app/api/routes/model.py now
 # imports workers.inference.inference_worker, which imports ml/ at module

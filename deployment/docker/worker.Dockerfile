@@ -1,4 +1,9 @@
-FROM python:3.11-slim
+# 3.14, not the spec's original 3.11: workers/requirements.txt and
+# ml/requirements.txt are pinned to versions verified against Python 3.14
+# (see the comments in those files) — some of those pins (numpy==2.5.2 in
+# particular) have dropped 3.11 support entirely. README.md's stated
+# prerequisite is "Python 3.11+", so 3.14 still satisfies it.
+FROM python:3.14-slim
 
 # Install system dependencies for geospatial packages and database connections
 RUN apt-get update && apt-get install -y --no-install-recommends \
