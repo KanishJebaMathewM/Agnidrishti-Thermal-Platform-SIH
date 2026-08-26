@@ -25,9 +25,9 @@ from typing import Any, Dict, Optional, Tuple
 
 logger = logging.getLogger("agnidrishti.bhuvan")
 
-# Standard ISRO / NRSC National LULC Classification Hierarchy
+# Standard ISRO / NRSC National LULC Classification Hierarchy (Level-1 & Level-2)
 BHUVAN_LULC_CODE_MAP = {
-    1: {"name": "Built-up / Urban / Industrial", "canonical": "INDUSTRIAL"},
+    1: {"name": "Built-up / Settlement / Urban", "canonical": "SETTLEMENT"},
     2: {"name": "Agricultural Land (Crop / Fallow)", "canonical": "AGRICULTURAL"},
     3: {"name": "Forest (Deciduous / Evergreen / Scrub)", "canonical": "FOREST"},
     4: {"name": "Grassland / Grazing", "canonical": "AGRICULTURAL"},
@@ -36,34 +36,65 @@ BHUVAN_LULC_CODE_MAP = {
     7: {"name": "Wetlands / Coastal", "canonical": "WATER"},
 }
 
+# Granular Level-2 sub-category mapping
 BHUVAN_CLASS_NAME_MAP = {
-    "built up": "INDUSTRIAL",
-    "built-up": "INDUSTRIAL",
-    "urban": "INDUSTRIAL",
+    # Industrial / Infrastructure (High-risk thermal context)
     "industrial": "INDUSTRIAL",
+    "mining": "INDUSTRIAL",
+    "quarry": "INDUSTRIAL",
+    "refinery": "INDUSTRIAL",
+    "power plant": "INDUSTRIAL",
+    "thermal plant": "INDUSTRIAL",
+    "steel mill": "INDUSTRIAL",
+    
+    # Residential / Settlement (Human habitat context)
+    "built up": "SETTLEMENT",
+    "built-up": "SETTLEMENT",
+    "urban": "SETTLEMENT",
     "settlement": "SETTLEMENT",
+    "residential": "SETTLEMENT",
+    "rural": "SETTLEMENT",
+    "commercial": "SETTLEMENT",
+    
+    # Agricultural Land (Stubble / seasonal burn context)
     "agriculture": "AGRICULTURAL",
     "agricultural": "AGRICULTURAL",
     "cropland": "AGRICULTURAL",
+    "crop land": "AGRICULTURAL",
     "kharif": "AGRICULTURAL",
     "rabi": "AGRICULTURAL",
     "zaid": "AGRICULTURAL",
     "double crop": "AGRICULTURAL",
     "fallow": "AGRICULTURAL",
     "plantation": "AGRICULTURAL",
+    "orchard": "AGRICULTURAL",
+    
+    # Forest (Wildfire / reserved forest context)
     "forest": "FOREST",
     "deciduous": "FOREST",
     "evergreen": "FOREST",
+    "semi-evergreen": "FOREST",
     "scrub": "FOREST",
+    "mangrove": "FOREST",
+    
+    # Water / Wetlands (Suppression context)
     "water": "WATER",
     "waterbody": "WATER",
+    "water body": "WATER",
     "river": "WATER",
+    "lake": "WATER",
+    "reservoir": "WATER",
     "wetland": "WATER",
+    
+    # Barren / Wasteland (Low-risk context)
     "barren": "BARREN",
     "wasteland": "BARREN",
+    "waste land": "BARREN",
     "rocky": "BARREN",
-    "mining": "INDUSTRIAL",
+    "sand": "BARREN",
+    "gullied": "BARREN",
 }
+
 
 # State code mapping for Bhuvan WMS state-level layers
 STATE_LAYER_CODES = {
