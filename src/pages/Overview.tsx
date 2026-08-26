@@ -191,8 +191,16 @@ export default function Overview() {
             </div>
           </div>
           <div className="p-3 flex-1">
-            <IndiaMap events={mapEvents} height={460} onMarkerClick={(id) => navigate(`/events?selected=${id}`)} />
+            <IndiaMap
+              events={mapEvents}
+              height={460}
+              loading={loading}
+              error={error}
+              onRetry={refetch}
+              onMarkerClick={(id) => navigate(`/events?selected=${id}`)}
+            />
           </div>
+
         </div>
 
         {/* Recent Events Panel (1 column) */}
