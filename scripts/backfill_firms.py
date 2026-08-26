@@ -34,7 +34,7 @@ DEFAULT_TRACKER_PATH = os.path.join(
 )
 
 
-def chunk_ranges(start: date, end: date, chunk_days: int = 10):
+def chunk_ranges(start: date, end: date, chunk_days: int = 5):
     current = start
     while current <= end:
         chunk_end = min(current + timedelta(days=chunk_days - 1), end)

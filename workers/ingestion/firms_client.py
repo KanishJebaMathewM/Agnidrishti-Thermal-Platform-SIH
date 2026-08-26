@@ -33,13 +33,13 @@ class FIRMSClient:
         return self._fetch_csv(url)
 
     def fetch_archive_chunk(self, start_date: date, end_date: date) -> pd.DataFrame:
-        """Fetch one archive chunk (must be <=10 days) in a single request."""
-        days = (end_date - start_date).days + 1
-        url = f"{FIRMS_BASE_URL}/{self.map_key}/{PRODUCT_STANDARD}/{INDIA_BBOX}/{days}"
+        """Fetch one archive chunk (must be <=5 days) in a single request."""
+        days = min((end_date - start_date).days + 1, 5)
+        url = f"{FIRMS_BASE_URL}/{self.map_key}/{PRODUCT_STANDARD}/{INDIA_BBOX}/{days}/{start_date.isoformat()}"
         df = self._fetch_csv(url)
         # If standard archive is empty for recent window, fall back to NRT endpoint
         if df.empty and (date.today() - end_date).days <= 3:
-            df = self.fetch_nrt(days=min(days, 10))
+            df = self.fetch_nrt(days=min(days, 5))
         return df
 
     def fetch_archive(self, start_date: date, end_date: date) -> pd.DataFrame:

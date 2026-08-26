@@ -42,6 +42,11 @@ def generate_coverage_report(tracker_path: Path | None = None) -> dict:
     total_inserted = sum(r.get("records_inserted", 0) for r in successful_runs)
     total_duplicates = sum(r.get("records_skipped_duplicate", 0) for r in successful_runs)
 
+    start_dates = [r.get("parameters", {}).get("start") for r in successful_runs if r.get("parameters", {}).get("start")]
+    end_dates = [r.get("parameters", {}).get("end") for r in successful_runs if r.get("parameters", {}).get("end")]
+    earliest_date = min(start_dates) if start_dates else date.today().isoformat()
+    latest_date = max(end_dates) if end_dates else date.today().isoformat()
+
     live_firms_count = total_inserted
     demo_replay_count = 0  # 0 fixtures in live pipeline
 
@@ -55,8 +60,8 @@ def generate_coverage_report(tracker_path: Path | None = None) -> dict:
         "total_postgis_observations": live_firms_count,
         "duplicates_skipped": total_duplicates,
         "date_range": {
-            "earliest": date.today().isoformat(),
-            "latest": date.today().isoformat(),
+            "earliest": earliest_date,
+            "latest": latest_date,
         },
         "breakdown_by_satellite": {
             "VIIRS_SNPP_NRT": live_firms_count,

@@ -1,22 +1,42 @@
 {
-  "66ac45f8-7280-4470-9ffe-37d4ff6a1765": {
+  "3a5328e7-5c32-4147-a83d-ec0c9407a389": {
     "source_type": "FIRMS_VIIRS",
     "data_mode": "LIVE",
-    "run_start": "2026-08-26 12:12:31.412368+00:00",
-    "run_end": "2026-08-26 12:12:35.647947+00:00",
+    "run_start": "2026-08-26 12:39:27.979971+00:00",
+    "run_end": "2026-08-26 12:39:34.018809+00:00",
     "status": "SUCCESS",
-    "records_received_from_api": 45,
-    "records_validated": 22,
-    "records_inserted": 22,
+    "records_received_from_api": 781,
+    "records_validated": 347,
+    "records_inserted": 347,
     "records_updated": 0,
     "records_skipped_duplicate": 0,
     "records_failed": 0,
-    "records_fetched": 45,
+    "records_fetched": 781,
     "error_message": null,
     "parameters": {
-      "start": "2026-08-26",
+      "start": "2026-08-20",
+      "end": "2026-08-24"
+    },
+    "id": "3a5328e7-5c32-4147-a83d-ec0c9407a389"
+  },
+  "1075b3d4-271f-4355-bc97-7e49b7d58b6b": {
+    "source_type": "FIRMS_VIIRS",
+    "data_mode": "LIVE",
+    "run_start": "2026-08-26 12:39:35.077888+00:00",
+    "run_end": "2026-08-26 12:39:37.450142+00:00",
+    "status": "SUCCESS",
+    "records_received_from_api": 248,
+    "records_validated": 63,
+    "records_inserted": 0,
+    "records_updated": 0,
+    "records_skipped_duplicate": 63,
+    "records_failed": 0,
+    "records_fetched": 248,
+    "error_message": null,
+    "parameters": {
+      "start": "2026-08-25",
       "end": "2026-08-26"
     },
-    "id": "66ac45f8-7280-4470-9ffe-37d4ff6a1765"
+    "id": "1075b3d4-271f-4355-bc97-7e49b7d58b6b"
   }
 }
