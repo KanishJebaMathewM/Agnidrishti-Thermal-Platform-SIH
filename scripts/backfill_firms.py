@@ -59,23 +59,46 @@ def backfill(
             print(f"[skip] {chunk_start} - {chunk_end} already completed")
             continue
 
-        run_id = tracker.start_run(SOURCE_TYPE, parameters)
+        run_id = tracker.start_run(SOURCE_TYPE, parameters, data_mode="LIVE")
         try:
             df = client.fetch_archive_chunk(chunk_start, chunk_end)
             fetched = len(df)
+            validated = 0
             inserted = 0
+            duplicates = 0
+            failed = 0
             for _, row in df.iterrows():
-                obs = normalize_firms_row(row)
-                if obs is None:
-                    continue
-                if not is_within_india(obs["latitude"], obs["longitude"], india_geom):
-                    continue
-                if store.insert(obs):
-                    inserted += 1
-            tracker.complete_run(run_id, records_fetched=fetched, records_inserted=inserted)
+                try:
+                    obs = normalize_firms_row(row)
+                    if obs is None:
+                        failed += 1
+                        continue
+                    if not is_within_india(obs["latitude"], obs["longitude"], india_geom):
+                        continue
+                    validated += 1
+                    obs["data_mode"] = "LIVE"
+                    obs["ingestion_run_id"] = run_id
+                    if store.insert(obs):
+                        inserted += 1
+                    else:
+                        duplicates += 1
+                except Exception:
+                    failed += 1
+
+            tracker.complete_run(
+                run_id,
+                records_fetched=fetched,
+                records_inserted=inserted,
+                records_validated=validated,
+                records_skipped_duplicate=duplicates,
+                records_failed=failed,
+                data_mode="LIVE",
+            )
             total_fetched += fetched
             total_inserted += inserted
-            print(f"[ok] {chunk_start} - {chunk_end}: fetched={fetched} inserted={inserted}")
+            print(
+                f"[ok] {chunk_start} - {chunk_end}: fetched={fetched} validated={validated} inserted={inserted} duplicates={duplicates}"
+            )
         except Exception as e:
             tracker.fail_run(run_id, str(e))
             total_skipped += 1

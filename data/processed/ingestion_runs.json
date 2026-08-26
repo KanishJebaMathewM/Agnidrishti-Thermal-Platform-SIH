@@ -1,16 +1,22 @@
 {
-  "5e0f234a-242b-4081-9a50-b1e7581ff3e2": {
+  "66ac45f8-7280-4470-9ffe-37d4ff6a1765": {
     "source_type": "FIRMS_VIIRS",
-    "run_start": "2026-08-26 10:22:26.590949+00:00",
-    "run_end": "2026-08-26 10:22:31.533585+00:00",
+    "data_mode": "LIVE",
+    "run_start": "2026-08-26 12:12:31.412368+00:00",
+    "run_end": "2026-08-26 12:12:35.647947+00:00",
     "status": "SUCCESS",
-    "records_fetched": 0,
-    "records_inserted": 0,
+    "records_received_from_api": 45,
+    "records_validated": 22,
+    "records_inserted": 22,
+    "records_updated": 0,
+    "records_skipped_duplicate": 0,
+    "records_failed": 0,
+    "records_fetched": 45,
     "error_message": null,
     "parameters": {
       "start": "2026-08-26",
       "end": "2026-08-26"
     },
-    "id": "5e0f234a-242b-4081-9a50-b1e7581ff3e2"
+    "id": "66ac45f8-7280-4470-9ffe-37d4ff6a1765"
   }
 }
