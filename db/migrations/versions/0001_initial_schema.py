@@ -127,7 +127,7 @@ def upgrade() -> None:
         sa.Column('last_seen', sa.DateTime(timezone=True), nullable=True),
         sa.Column('centroid_lat', sa.Float(), nullable=False),
         sa.Column('centroid_lon', sa.Float(), nullable=False),
-        sa.Column('centroid', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='centroid'), nullable=False),
+        sa.Column('centroid', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=False),
         sa.Column('observation_count', sa.Integer(), nullable=False, server_default='0'),
         sa.Column('source_id', sa.UUID(), nullable=True),
         sa.Column('classification', sa.String(length=50), nullable=False),

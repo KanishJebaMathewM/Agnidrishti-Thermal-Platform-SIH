@@ -1,5 +1,7 @@
+from typing import Annotated
+
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -16,7 +18,11 @@ class Settings(BaseSettings):
     secret_key: str = "changeme"
     firms_api_key: str = ""
     firms_map_key: str = ""
-    cors_origins: list[str] = ["http://localhost:5173"]
+    # NoDecode: pydantic-settings otherwise tries to json.loads() the raw env
+    # string for any list-typed field before this validator runs, which fails
+    # on our comma-separated CORS_ORIGINS format (e.g. "a,b") with a
+    # SettingsError instead of ever reaching parse_cors_origins below.
+    cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:5173"]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
