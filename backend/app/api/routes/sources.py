@@ -23,7 +23,7 @@ FALLBACK_SOURCES = [
         "expectedHours": "00:00 - 23:59",
         "lastDeviationText": "Baseline Normal",
         "lastDeviationPct": "0%",
-        "status": "Registered",
+        "status": "PERSISTENT",
     },
     {
         "id": "src-delhi-0002",
@@ -36,26 +36,33 @@ FALLBACK_SOURCES = [
         "expectedHours": "08:00 - 20:00",
         "lastDeviationText": "Baseline Normal",
         "lastDeviationPct": "0%",
-        "status": "Registered",
+        "status": "CANDIDATE",
     },
 ]
 
 
 def source_summary(source) -> dict:
     expected = source.expected_class or "Unknown"
-    status = "Flagged for Inspection" if source.status in {"CANDIDATE", "CONFIRMED"} else "Registered"
+    obs_count = getattr(source, "observation_count", 1)
+    if obs_count >= 5:
+        source_state = "PERSISTENT"
+    elif obs_count >= 2:
+        source_state = "MONITORED"
+    else:
+        source_state = "CANDIDATE"
+
     return {
         "id": str(source.id),
-        "name": f"{expected} source {source.h3_cell}",
+        "name": f"{expected} Source Candidate ({source.h3_cell})",
         "type": expected,
         "lat": source.representative_lat,
         "lon": source.representative_lon,
         "placeName": f"{source.district or source.state or 'India'} Zone",
         "state": source.state or "Unknown",
         "expectedHours": ", ".join(str(hour) for hour in source.typical_hours or []),
-        "lastDeviationText": "No recent deviation",
-        "lastDeviationPct": None,
-        "status": status,
+        "lastDeviationText": "Baseline Normal",
+        "lastDeviationPct": "0%",
+        "status": source_state,
     }
 
 

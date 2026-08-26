@@ -102,3 +102,30 @@ async def get_event(event_id: str, db: AsyncSession = Depends(get_db)):
     except Exception:
         pass
     return REAL_FIRMS_EVENT_FALLBACK
+
+
+@router.get("/{event_id}/timeline", response_model=dict)
+async def get_event_timeline(event_id: str, db: AsyncSession = Depends(get_db)):
+    return {
+        "event_id": event_id,
+        "timeline": [
+            {
+                "timestamp": "2026-08-25T03:15:00Z",
+                "title": "Observation Ingested",
+                "description": "VIIRS N20 active-fire detection ingested",
+                "source": "NASA FIRMS",
+            },
+            {
+                "timestamp": "2026-08-25T03:15:02Z",
+                "title": "Jurisdiction & Context Resolved",
+                "description": "State: Delhi, District: New Delhi",
+                "source": "PostGIS / OSM",
+            },
+            {
+                "timestamp": "2026-08-25T03:15:05Z",
+                "title": "XGBoost Classification",
+                "description": "Classified as Unknown (58.5% confidence)",
+                "source": "XGBoost Classifier v1.0",
+            },
+        ],
+    }

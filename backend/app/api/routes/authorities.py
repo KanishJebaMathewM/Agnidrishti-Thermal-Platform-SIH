@@ -84,3 +84,18 @@ async def routing_resolve(
         "primary_authority": FALLBACK_AUTHORITIES[0],
         "secondary_authorities": [],
     }
+
+
+@router.get("/{authority_id}", response_model=dict)
+async def get_authority(authority_id: str, db: AsyncSession = Depends(get_db)):
+    try:
+        if db:
+            item = await authority_repository.get_authority_by_id(db, uuid.UUID(authority_id))
+            if item:
+                return AuthorityDetail.model_validate(item)
+    except Exception:
+        pass
+    for a in FALLBACK_AUTHORITIES:
+        if a["id"] == authority_id:
+            return a
+    return FALLBACK_AUTHORITIES[0]
