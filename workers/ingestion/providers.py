@@ -155,19 +155,27 @@ class OSMProvider(DataProvider):
 
 
 class BhuvanProvider(DataProvider):
-    """ISRO Bhuvan Land-Use / Land-Cover context provider (Section 8 of Master Spec)."""
+    """ISRO Bhuvan Land-Use / Land-Cover context provider (Section 8 of Master Spec).
+    
+    Connects to the official ISRO Bhuvan LULC AOI Wise API using BHUVAN_API_TOKEN.
+    Zero synthetic or mock polygons. Returns DATA UNAVAILABLE if API is unreachable.
+    """
+
+    def __init__(self, token: Optional[str] = None):
+        from workers.ingestion.bhuvan_provider import BhuvanProvider as OfficialBhuvanClient
+        self._client = OfficialBhuvanClient(token=token)
 
     @property
     def source_name(self) -> str:
         return "ISRO_BHUVAN_LULC"
 
     def fetch(self, **kwargs: Any) -> list[dict[str, Any]]:
-        ref_file = os.path.join("data", "reference", "landuse", "landuse_features.geojson")
-        if os.path.exists(ref_file):
-            import json
-            with open(ref_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                return data.get("features", [])
+        lat = kwargs.get("latitude") or kwargs.get("lat")
+        lon = kwargs.get("longitude") or kwargs.get("lon")
+        state = kwargs.get("state")
+        if lat is not None and lon is not None:
+            res = self._client.query_lulc_at_point(float(lat), float(lon), state=state)
+            return [res]
         return []
 
     def validate(self, raw_data: Any) -> bool:

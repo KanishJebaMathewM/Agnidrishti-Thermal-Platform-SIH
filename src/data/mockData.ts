@@ -542,7 +542,7 @@ export const dataSources: DataSourceInfo[] = [
   { name: 'NASA FIRMS', description: 'MODIS & VIIRS active fire detections from Aqua/Terra/SNPP satellites.', status: 'Active', lastSync: '4 min ago', coverage: 'Global, 375m resolution', icon: 'satellite' },
   { name: 'ISRO INSAT-3DR', description: 'Imager thermal channel data via MOSDAC for Indian subcontinent.', status: 'Active', lastSync: '12 min ago', coverage: 'India + Indian Ocean, 4km', icon: 'radio' },
   { name: 'OpenStreetMap Overpass', description: 'Industrial infrastructure tags for known-source suppression.', status: 'Active', lastSync: '1 hr ago', coverage: 'OSM industrial polygons', icon: 'map' },
-  { name: 'ISRO Bhuvan', description: 'Land use / land cover and administrative boundary layers.', status: 'Delayed', lastSync: '6 hr ago', coverage: 'Thematic LULC tiles', icon: 'layers' },
+  { name: 'ISRO Bhuvan (LULC AOI Wise)', description: 'Land Use / Land Cover 50K thematic layers and AOI statistics via official API.', status: 'Active', lastSync: '1 min ago', coverage: 'All-India LULC 1:50,000 Grid', icon: 'layers' },
   { name: 'Forest Survey of India', description: 'Forest cover and fire-prone zone designations.', status: 'Active', lastSync: '2 hr ago', coverage: 'India forest grid 1:50,000', icon: 'tree' },
 ]
 

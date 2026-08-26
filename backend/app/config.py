@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     secret_key: str = "changeme"
     firms_api_key: str = ""
     firms_map_key: str = ""
+    bhuvan_api_token: str = ""
     # NoDecode: pydantic-settings otherwise tries to json.loads() the raw env
     # string for any list-typed field before this validator runs, which fails
     # on our comma-separated CORS_ORIGINS format (e.g. "a,b") with a
