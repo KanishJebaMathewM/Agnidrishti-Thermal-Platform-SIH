@@ -94,6 +94,14 @@ def discover_sources_from_observations():
         state = geo.get("state") or "India"
         district = geo.get("district") or "District"
 
+        obs_cnt = len(cluster_obs)
+        if obs_cnt >= 5:
+            source_state = "PERSISTENT"
+        elif obs_cnt >= 2:
+            source_state = "MONITORED"
+        else:
+            source_state = "CANDIDATE"
+
         sources.append({
             "source_id": f"SRC-IND-{state[:2].upper()}-{district[:3].upper()}-{source_idx:03d}",
             "lat": lat,
@@ -101,7 +109,8 @@ def discover_sources_from_observations():
             "state": state,
             "district": district,
             "nearest_facility": geo.get("nearest_facility_name") or f"{district} Thermal Area",
-            "observation_count": len(cluster_obs),
+            "observation_count": obs_cnt,
+            "source_state": source_state,
             "first_seen": first_seen,
             "last_seen": last_seen,
             "mean_frp": round(mean_frp, 2),
@@ -125,14 +134,17 @@ def run_comprehensive_registry_audit():
 
     total_obs = 2233  # Live PostGIS database observations
     total_sources = len(sources)
+    persistent_sources = [s for s in sources if s["source_state"] == "PERSISTENT"]
+    candidate_sources = [s for s in sources if s["source_state"] == "CANDIDATE"]
     total_events = math.ceil(total_obs / 3.8)  # ST-DBSCAN spatio-temporal reduction
 
     print(f"Historical period:               2026-07-28 -> 2026-08-26 (30 Days)")
     print(f"Current coverage:                30 Days (Complete)")
     print(f"30-day live observations:        {total_obs:,}")
-    print(f"Unique discovered sources:       {total_sources}")
+    print(f"Discovered source candidates:    {len(candidate_sources)}")
+    print(f"Persistent thermal sources:      {len(persistent_sources)}")
     print(f"Unique aggregated events:        {total_events:,}")
-    print(f"Observation-to-event ratio:     3.8 : 1 (73.6% reduction)")
+    print(f"Observation-to-event reduction:  73.6% aggregation reduction (3.8 : 1 ratio)")
 
     print("\n--- TOP DISCOVERED THERMAL SOURCES (DATA-DRIVEN) ---")
     for s in sources[:4]:
