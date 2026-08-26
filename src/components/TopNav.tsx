@@ -92,27 +92,6 @@ export default function TopNav() {
 
           {/* Right Status & Profile Controls — never shrinks, always visible */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Live Sync Status Indicator */}
-            <div className="hidden lg:flex items-center gap-2 text-xs bg-emerald-50/80 border border-emerald-200/90 px-3 py-1.5 rounded-full shrink-0">
-              <span className="relative flex w-2 h-2">
-                {isLive && <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />}
-                <span className={`relative w-2 h-2 rounded-full ${isLive ? 'bg-emerald-600' : 'bg-rose-500'}`} />
-              </span>
-              <span className="text-emerald-950 font-bold font-mono text-[11px] whitespace-nowrap">
-                {isLive ? (
-                  <>
-                    <span>LIVE DATA · NASA FIRMS</span>
-                    <span className="text-emerald-400 mx-1">•</span>
-                    <span>Database Events: 65,840</span>
-                    <span className="text-emerald-400 mx-1">•</span>
-                    <span>Last Ingestion: {formatDistanceToNow(lastSync)}</span>
-                  </>
-                ) : (
-                  <span>BACKEND OFFLINE / REPLAY MODE</span>
-                )}
-              </span>
-            </div>
-
             {/* Notification Bell */}
             <button className="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none shrink-0" aria-label="Notifications">
               <Bell className="w-5 h-5" />
