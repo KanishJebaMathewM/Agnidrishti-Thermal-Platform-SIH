@@ -1,7 +1,13 @@
+import asyncio
+import sys
+
+# Windows asyncio loop fix for psycopg async driver
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import settings
 from app.api.routes import authorities, dashboard, events, feedback, health, model, notifications, sources
 
 app = FastAPI(
@@ -9,13 +15,15 @@ app = FastAPI(
     version="0.1.0",
     description="Thermal anomaly detection and monitoring platform",
 )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 app.include_router(events.router, prefix="/events", tags=["events"])
 app.include_router(sources.router, prefix="/sources", tags=["sources"])
 app.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])

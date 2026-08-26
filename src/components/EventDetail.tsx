@@ -142,7 +142,9 @@ function EventDetailContent({
         {/* Location */}
         <div className="panel p-3">
           <div className="text-xs text-muted mb-1">Location</div>
-          <div className="text-sm font-medium text-ink">{event.placeName}, {event.state}</div>
+          <div className="text-sm font-medium text-ink">
+            {event.placeName?.includes(event.state) ? event.placeName : `${event.placeName}, ${event.state}`}
+          </div>
           <div className="text-xs text-muted font-mono mt-1">{formatCoord(event.lat, event.lon)}</div>
         </div>
 
@@ -158,10 +160,10 @@ function EventDetailContent({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs text-muted">{f.label}</span>
-                      <span className="text-sm font-mono font-medium text-ink">{f.value}</span>
+                      <span className="text-xs font-mono font-medium text-ink">{f.value}</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-border overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, f.pct))}%`, backgroundColor: hue.mid }} />
+                    <div className="h-1.5 rounded-full bg-muted/20 overflow-hidden">
+                      <div className="h-full bg-slate-700 rounded-full" style={{ width: `${Math.max(f.pct, 5)}%` }} />
                     </div>
                   </div>
                 </div>
@@ -174,18 +176,20 @@ function EventDetailContent({
         <div>
           <h3 className="text-sm font-semibold text-ink mb-3">Deviation from Baseline</h3>
           <div className="panel p-4">
-            <div className="flex items-end justify-between mb-3">
+            <div className="grid grid-cols-3 gap-2 mb-3">
               <div>
-                <div className="text-xs text-muted">Baseline (normal)</div>
-                <div className="font-mono text-lg font-semibold text-muted">{event.baseline}</div>
+                <div className="text-[11px] text-muted truncate">Baseline (normal)</div>
+                <div className="font-mono text-base font-semibold text-muted">{event.baseline}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-[11px] text-muted truncate">Current reading</div>
+                <div className="font-mono text-base font-semibold text-ember-deep">{event.current}</div>
               </div>
               <div className="text-right">
-                <div className="text-xs text-muted">Current reading</div>
-                <div className="font-mono text-lg font-semibold text-ember-deep">{event.current}</div>
-              </div>
-              <div className="text-right">
-                <div className="text-xs text-muted">Deviation</div>
-                <div className="font-mono text-lg font-semibold text-ember-mid">+{deviationPct}%</div>
+                <div className="text-[11px] text-muted truncate">Deviation</div>
+                <div className="font-mono text-base font-semibold text-ember-mid">
+                  {Number(deviationPct) > 0 ? `+${deviationPct}%` : `${deviationPct}%`}
+                </div>
               </div>
             </div>
             <div className="space-y-2">

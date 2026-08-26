@@ -16,14 +16,17 @@ async_session = async_sessionmaker(
     expire_on_commit=False,
 )
 
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_db() -> AsyncGenerator[AsyncSession | None, None]:
     """Dependency injection helper for database session."""
-    async with async_session() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
+    try:
+        async with async_session() as session:
+            try:
+                yield session
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
+            finally:
+                await session.close()
+    except Exception:
+        yield None

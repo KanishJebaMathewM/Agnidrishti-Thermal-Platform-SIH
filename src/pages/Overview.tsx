@@ -90,9 +90,12 @@ export default function Overview() {
     },
   ]
 
+  const classDist = Array.isArray(summary?.classification_distribution) ? summary.classification_distribution : []
+  const riskSummary = Array.isArray(summary?.risk_level_summary) ? summary.risk_level_summary : []
+
   return (
-    <div className="space-y-5">
-      {/* Header Bar */}
+    <div className="space-y-4">
+      {/* Header bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">National Thermal Anomaly Overview</h1>
@@ -339,7 +342,7 @@ export default function Overview() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={summary?.classification_distribution ?? []}
+                    data={classDist}
                     cx="50%"
                     cy="50%"
                     innerRadius={32}
@@ -347,7 +350,7 @@ export default function Overview() {
                     paddingAngle={2}
                     dataKey="value"
                   >
-                    {(summary?.classification_distribution ?? []).map((entry, index) => (
+                    {classDist.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -361,7 +364,7 @@ export default function Overview() {
 
             {/* Legend list */}
             <div className="flex-1 space-y-1 text-[11px]">
-              {(summary?.classification_distribution ?? []).map((item) => (
+              {classDist.map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
@@ -386,7 +389,7 @@ export default function Overview() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={summary?.risk_level_summary ?? []}
+                    data={riskSummary}
                     cx="50%"
                     cy="50%"
                     innerRadius={32}
@@ -394,7 +397,7 @@ export default function Overview() {
                     paddingAngle={2}
                     dataKey="count"
                   >
-                    {(summary?.risk_level_summary ?? []).map((entry, index) => (
+                    {riskSummary.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -410,9 +413,9 @@ export default function Overview() {
               </div>
             </div>
 
-            {/* Legend list */}
+            {/* Legend List */}
             <div className="flex-1 space-y-1 text-[11px]">
-              {(summary?.risk_level_summary ?? []).map((item) => (
+              {riskSummary.map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />

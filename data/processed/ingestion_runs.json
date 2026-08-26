@@ -1,0 +1,16 @@
+{
+  "5e0f234a-242b-4081-9a50-b1e7581ff3e2": {
+    "source_type": "FIRMS_VIIRS",
+    "run_start": "2026-08-26 10:22:26.590949+00:00",
+    "run_end": "2026-08-26 10:22:31.533585+00:00",
+    "status": "SUCCESS",
+    "records_fetched": 0,
+    "records_inserted": 0,
+    "error_message": null,
+    "parameters": {
+      "start": "2026-08-26",
+      "end": "2026-08-26"
+    },
+    "id": "5e0f234a-242b-4081-9a50-b1e7581ff3e2"
+  }
+}
