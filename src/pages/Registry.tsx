@@ -7,6 +7,7 @@ import { type RegistrySource } from '../data/mockData'
 import { formatCoord, RegistryStatusBadge, RegistryTypeBadge } from '../components/Badges'
 import LoadingSkeleton from '../components/shared/LoadingSkeleton'
 import EmptyState from '../components/shared/EmptyState'
+import Pagination from '../components/shared/Pagination'
 import { useSourcesList } from '../hooks/useSourcesList'
 
 const typeIconMap = {
@@ -29,6 +30,8 @@ export default function Registry() {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const { sources: registrySources, loading, error } = useSourcesList()
 
   const types = useMemo(() => [...new Set(registrySources.map((s) => s.type))].sort(), [registrySources])
@@ -41,6 +44,11 @@ export default function Registry() {
       return true
     })
   }, [registrySources, search, typeFilter, statusFilter])
+
+  const paginatedSources = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filtered.slice(start, start + pageSize)
+  }, [filtered, currentPage, pageSize])
 
   const flaggedCount = registrySources.filter((s) => s.status === 'Flagged for Inspection').length
 
@@ -168,7 +176,7 @@ export default function Registry() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filtered.slice(0, 10).map((s: RegistrySource) => {
+              {paginatedSources.map((s: RegistrySource) => {
                 const Icon = typeIconMap[s.type] || Factory
                 const bgStyle = typeBgMap[s.type] || 'bg-slate-100 text-slate-600 border-slate-200'
 
@@ -255,38 +263,16 @@ export default function Registry() {
         </div>
 
         {/* Pagination Footer */}
-        <div className="px-5 py-3.5 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600 font-medium">
-          <div className="flex items-center gap-3">
-            <span>Rows per page</span>
-            <select className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold">
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-            </select>
-            <span>Showing 1 to 10 of {filtered.length} results</span>
-          </div>
-
-          {/* Page buttons */}
-          <div className="flex items-center gap-1">
-            <button className="px-2 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 font-mono">
-              &laquo;
-            </button>
-            <button className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 font-mono">
-              &lt;
-            </button>
-            <button className="px-3 py-1 rounded-lg bg-teal-700 text-white font-bold">1</button>
-            <button className="px-3 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100">2</button>
-            <button className="px-3 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100">3</button>
-            <span className="px-1 text-slate-400">...</span>
-            <button className="px-3 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100">6</button>
-            <button className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 font-mono">
-              &gt;
-            </button>
-            <button className="px-2 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 font-mono">
-              &raquo;
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={filtered.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize)
+            setCurrentPage(1)
+          }}
+        />
       </div>
       )}
     </div>

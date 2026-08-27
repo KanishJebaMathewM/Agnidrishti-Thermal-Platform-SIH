@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { ClassificationBadge, ConfidenceTag } from '../components/Badges'
 import LoadingSkeleton from '../components/shared/LoadingSkeleton'
+import Pagination from '../components/shared/Pagination'
 import { type Agency, type Classification } from '../data/mockData'
 import { useEventsList } from '../hooks/useEventsList'
 import { getAuthorities } from '../api/authoritiesApi'
@@ -28,6 +29,7 @@ export default function Alerts() {
   const [classFilter, setClassFilter] = useState('all')
   const [stateFilter, setStateFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const { events: allEvents, loading, error } = useEventsList()
 
   const [agencies, setAgencies] = useState<Agency[]>([])
@@ -77,9 +79,9 @@ export default function Alerts() {
   }, [alertsData, agencyFilter, classFilter, stateFilter])
 
   const paginatedAlerts = useMemo(() => {
-    const start = (currentPage - 1) * 10
-    return filteredAlerts.slice(start, start + 10)
-  }, [filteredAlerts, currentPage])
+    const start = (currentPage - 1) * pageSize
+    return filteredAlerts.slice(start, start + pageSize)
+  }, [filteredAlerts, currentPage, pageSize])
 
   return (
     <div className="space-y-5">
@@ -336,24 +338,17 @@ export default function Alerts() {
           </div>
 
           {/* Pagination Controls */}
-          <div className="flex items-center gap-3 text-slate-600">
-            <select className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold shadow-2xs">
-              <option value="10">10 per page</option>
-              <option value="25">25 per page</option>
-            </select>
-            <span>1 - 10 of {filteredAlerts.length}</span>
-
-            <div className="flex items-center gap-1">
-              <button className="px-2 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 font-mono">&laquo;</button>
-              <button className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 font-mono">&lt;</button>
-              <button className="px-3 py-1 rounded-lg bg-teal-700 text-white font-bold">1</button>
-              <button className="px-3 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100">2</button>
-              <button className="px-3 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100">3</button>
-              <span className="px-1 text-slate-400">...</span>
-              <button className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 font-mono">&gt;</button>
-              <button className="px-2 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 font-mono">&raquo;</button>
-            </div>
-          </div>
+          <Pagination
+            className="border-t-0 bg-transparent p-0 w-full xl:w-auto justify-end"
+            currentPage={currentPage}
+            totalItems={filteredAlerts.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize)
+              setCurrentPage(1)
+            }}
+          />
         </div>
       </div>
       )}
