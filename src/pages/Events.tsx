@@ -7,6 +7,7 @@ import {
 import { ClassificationBadge, StatusBadge, ConfidenceTag, formatCoord } from '../components/Badges'
 import EmptyState from '../components/shared/EmptyState'
 import Pagination from '../components/shared/Pagination'
+import DateRangePicker from '../components/shared/DateRangePicker'
 import { classificationHue, type Classification } from '../data/mockData'
 import { useEventsList } from '../hooks/useEventsList'
 import EventDetail from '../components/EventDetail'
@@ -21,6 +22,8 @@ export default function Events() {
   const [classFilter, setClassFilter] = useState<Classification | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<'all' | 'Suppressed' | 'Escalated' | 'Under Review'>('all')
   const [stateFilter, setStateFilter] = useState('all')
+  const [startDate, setStartDate] = useState('2026-08-01')
+  const [endDate, setEndDate] = useState('2026-08-27')
   const [sortKey, setSortKey] = useState<SortKey>('timestamp')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [currentPage, setCurrentPage] = useState(1)
@@ -37,6 +40,11 @@ export default function Events() {
   const filtered = useMemo(() => {
     let result = allEvents.filter((e) => {
       if (search && !e.placeName.toLowerCase().includes(search.toLowerCase()) && !e.id.toLowerCase().includes(search.toLowerCase())) return false
+      if (startDate || endDate) {
+        const evDate = e.timestamp ? e.timestamp.split('T')[0] : ''
+        if (startDate && evDate && evDate < startDate) return false
+        if (endDate && evDate && evDate > endDate) return false
+      }
       return true
     })
     result = [...result].sort((a, b) => {
@@ -48,7 +56,7 @@ export default function Events() {
       return sortDir === 'asc' ? cmp : -cmp
     })
     return result
-  }, [allEvents, search, sortKey, sortDir])
+  }, [allEvents, search, sortKey, sortDir, startDate, endDate])
 
   const paginatedEvents = useMemo(() => {
     const start = (currentPage - 1) * pageSize
@@ -148,19 +156,25 @@ export default function Events() {
               ))}
             </select>
 
-            <div className="relative">
-              <select className="input text-xs font-medium pr-8">
-                <option value="7d">Last 7 days</option>
-                <option value="24h">Last 24 hours</option>
-                <option value="30d">Last 30 days</option>
-              </select>
-              <Calendar className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-            </div>
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(s, e) => {
+                setStartDate(s);
+                setEndDate(e);
+                setCurrentPage(1);
+              }}
+            />
           </div>
 
           {/* Clear Button */}
           <button
-            onClick={clearFilters}
+            onClick={() => {
+              clearFilters();
+              setStartDate('2026-08-01');
+              setEndDate('2026-08-27');
+              setCurrentPage(1);
+            }}
             className="text-xs font-bold text-teal-700 hover:text-teal-900 px-2 py-1 shrink-0"
           >
             Clear all
