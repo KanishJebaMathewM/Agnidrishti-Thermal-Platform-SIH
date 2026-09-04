@@ -4,7 +4,7 @@
 
 ![AGNIDRISHTI Banner](https://img.shields.io/badge/AGNIDRISHTI-Thermal%20Anomaly%20Intelligence-0d9488?style=for-the-badge&logo=satellite&logoColor=white)
 
-[![SIH Problem Statement](https://img.shields.io/badge/SIH%202024-Problem%20Statement%20SIH26162-orange?style=flat-square)](https://www.sih.gov.in/)
+[![SIH Problem Statement](https://img.shields.io/badge/SIH%202026-Problem%20Statement%20SIH26162-orange?style=flat-square)](https://www.sih.gov.in/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.141+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -16,7 +16,7 @@
 
 **An enterprise-grade, physics-informed thermal anomaly intelligence platform for satellite-driven detection, spatio-temporal event clustering, industrial baseline suppression, machine learning classification, and automated agency alert routing across India.**
 
-[Overview](#-executive-overview) • [Key Capabilities](#-key-capabilities) • [Architecture](#-system-architecture) • [ML & Physics Engine](#-machine-learning--physics-engine) • [API Reference](#-api-reference) • [Dashboard Screens](#-interactive-dashboard-screens) • [Quickstart](#-quickstart--installation) • [Docker Deployment](#-docker--production-deployment) • [Testing & Verification](#-testing--audit-framework) • [Contributor Architecture](#-contributor-workflows)
+[Overview](#-executive-overview) • [Key Capabilities](#-key-capabilities) • [Architecture](#-system-architecture) • [ML & Physics Engine](#-machine-learning--physics-engine) • [API Reference](#-api-reference) • [Dashboard Screens](#-interactive-dashboard-screens) • [Quickstart](#-quickstart--installation) • [Docker Deployment](#-docker--production-deployment) • [Testing & Verification](#-testing--audit-framework) • [Problem Statement](#-problem-statement--data-acknowledgments)
 
 </div>
 
@@ -470,27 +470,9 @@ $env:PYTHONPATH=".;backend;ml;workers"; python scripts/demo_replay.py
 PYTHONPATH=".:backend:ml:workers" python scripts/demo_replay.py
 ```
 
----
-
-## 👥 Contributor Workflows
-
-AGNIDRISHTI is architected into 5 decoupled domain boundaries to allow multiple contributors or AI agents to work concurrently without merge conflicts:
-
-| Domain | Scope & Responsibility | Implementation Guide | Feature Branch |
-|---|---|---|---|
-| **Contributor 1** | Infrastructure, PostGIS Database & FastAPI Core | [CONTRIBUTOR_1_INFRA_AND_BACKEND.md](CONTRIBUTOR_1_INFRA_AND_BACKEND.md) | `feat/infra-backend` |
-| **Contributor 2** | NASA FIRMS Ingestion, OSM & Data Pipeline | [CONTRIBUTOR_2_DATA_PIPELINE.md](CONTRIBUTOR_2_DATA_PIPELINE.md) | `feat/data-pipeline` |
-| **Contributor 3** | ML Pipeline, Feature Extraction & Event Formation | [CONTRIBUTOR_3_ML_PIPELINE.md](CONTRIBUTOR_3_ML_PIPELINE.md) | `feat/ml-pipeline` |
-| **Contributor 4** | React Frontend, Leaflet Map & UI State | [CONTRIBUTOR_4_FRONTEND_INTEGRATION.md](CONTRIBUTOR_4_FRONTEND_INTEGRATION.md) | `feat/frontend-integration` |
-| **Contributor 5** | Jurisdiction Routing, Notifications & DevOps | [CONTRIBUTOR_5_ROUTING_NOTIFICATIONS_AND_DEVOPS.md](CONTRIBUTOR_5_ROUTING_NOTIFICATIONS_AND_DEVOPS.md) | `feat/routing-notifications-devops` |
-
-Refer to [CONTRIBUTOR_INDEX.md](CONTRIBUTOR_INDEX.md) and [AGNIDRISHTI_PLAN.md](AGNIDRISHTI_PLAN.md) for domain interfaces and contract definitions.
-
----
-
 ## 📜 Problem Statement & Data Acknowledgments
 
-- **Smart India Hackathon (SIH 2024)**: Problem Statement `SIH26162`
+- **Smart India Hackathon (SIH 2026)**: Problem Statement `SIH26162`
 - **NASA LANCE / FIRMS**: Thermal anomaly data provided by NASA's Land, Atmosphere Near real-time Capability for EOS (LANCE) Fire Information for Resource Management System.
 - **OpenStreetMap**: Infrastructure, industrial zones, and land-use spatial reference layers under ODbL.
 - **Survey of India & GADM**: Administrative state and district boundaries.
@@ -499,7 +481,7 @@ Refer to [CONTRIBUTOR_INDEX.md](CONTRIBUTOR_INDEX.md) and [AGNIDRISHTI_PLAN.md](
 
 <div align="center">
 
-**Built with precision by Team Tech Pulse for Smart India Hackathon (SIH 2024).**  
+**Built with precision by Team Tech Pulse for Smart India Hackathon (SIH 2026).**  
 *Empowering rapid, accurate, and false-alarm-resilient thermal disaster response across India.*
 
 </div>
