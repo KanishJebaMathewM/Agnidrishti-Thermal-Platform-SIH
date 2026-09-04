@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
   Activity, Flame, BarChart3, Calendar, Clock, ShieldCheck, Download, Filter,
-  Info, ChevronDown, Lightbulb, AlertCircle, RefreshCw
+  Info, ChevronDown, Lightbulb, AlertCircle, RefreshCw, ZoomIn
 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar
+  BarChart, Bar, Brush
 } from 'recharts'
 import { classificationHue } from '../data/mockData'
 import { getDashboardTrends } from '../api/dashboardApi'
@@ -30,12 +30,51 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 // Agricultural seasonal profile (peak harvest Oct-Dec, rabi Apr-May)
 const SEASONAL_MONTHLY_WEIGHTS = [28, 32, 45, 62, 78, 83, 42, 35, 48, 192, 215, 278]
 
+interface CustomTooltipProps {
+  active?: boolean
+  payload?: any[]
+  label?: string
+}
+
+const CustomTrendsTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    const total = payload.reduce((sum: number, entry: any) => sum + (Number(entry.value) || 0), 0)
+    return (
+      <div className="bg-white/95 backdrop-blur-md p-3 rounded-xl shadow-lg border border-slate-200 text-xs min-w-[190px]">
+        <div className="font-bold text-slate-900 mb-1.5 pb-1 border-b border-slate-100 flex items-center justify-between">
+          <span>{label}</span>
+          <span className="text-teal-700 font-extrabold">{total} Total</span>
+        </div>
+        <div className="space-y-1">
+          {payload.map((entry: any, index: number) => {
+            const val = Number(entry.value) || 0
+            const pct = total > 0 ? Math.round((val / total) * 100) : 0
+            return (
+              <div key={`item-${index}`} className="flex items-center justify-between gap-3 text-[11px]">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                  <span className="text-slate-600 font-medium">{entry.name}</span>
+                </div>
+                <span className="font-bold text-slate-800 font-mono">
+                  {val} <span className="text-slate-400 font-normal text-[10px]">({pct}%)</span>
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+  return null
+}
+
 export default function Trends() {
   const [regionFilter, setRegionFilter] = useState('all')
   const [classFilter, setClassFilter] = useState('all')
   const [granularity, setGranularity] = useState<'daily' | 'weekly' | 'monthly'>('daily')
   const [startDate, setStartDate] = useState('2026-07-28')
   const [endDate, setEndDate] = useState('2026-08-27')
+  const [activeQuickRange, setActiveQuickRange] = useState<string>('30D')
   const [trendsData, setTrendsData] = useState<any>(null)
   const [trendsError, setTrendsError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -58,6 +97,15 @@ export default function Trends() {
     fetchTrends()
   }, [])
 
+  const handleQuickRange = (days: number, label: string) => {
+    setActiveQuickRange(label)
+    const end = new Date(2026, 7, 27) // 27 Aug 2026
+    const start = new Date(end)
+    start.setDate(end.getDate() - days)
+    setStartDate(start.toISOString().split('T')[0])
+    setEndDate(end.toISOString().split('T')[0])
+  }
+
   // Generate dynamic time-series points based on the active startDate and endDate
   const timeSeriesData = useMemo(() => {
     const start = new Date(startDate)
@@ -69,6 +117,7 @@ export default function Trends() {
     const diffDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)))
     const points: Array<{
       date: string
+      fullDate: string
       timestamp: number
       industrial: number
       flare: number
@@ -78,9 +127,9 @@ export default function Trends() {
       total: number
     }> = []
 
-    // Adjust step depending on range or chosen granularity
+    // Adjust step depending on chosen granularity
     let stepDays = 1
-    if (granularity === 'weekly' || (granularity === 'daily' && diffDays > 90)) {
+    if (granularity === 'weekly' || (granularity === 'daily' && diffDays > 120)) {
       stepDays = 7
     } else if (granularity === 'monthly' || diffDays > 365) {
       stepDays = 30
@@ -99,12 +148,13 @@ export default function Trends() {
           ? `${monthStr} ${year}`
           : `${String(day).padStart(2, '0')} ${monthStr}`
 
+      const fullDateStr = curr.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+
       // Seasonal wave modifiers
       const seasonalMod = SEASONAL_MONTHLY_WEIGHTS[monthIdx] / 100
       const isMonsoon = monthIdx >= 5 && monthIdx <= 7
       const isStubble = monthIdx >= 9 && monthIdx <= 11
 
-      const baseDaily = 35 + Math.sin(day * 0.5) * 8
       let industrial = Math.round(18 + Math.sin(day * 0.3) * 6)
       let flare = Math.round(15 + Math.cos(day * 0.4) * 5)
       let agri = Math.round((isStubble ? 95 : isMonsoon ? 12 : 32) * seasonalMod + (day % 7) * 2)
@@ -138,6 +188,7 @@ export default function Trends() {
 
       points.push({
         date: dateLabel,
+        fullDate: fullDateStr,
         timestamp: curr.getTime(),
         industrial,
         flare,
@@ -167,7 +218,7 @@ export default function Trends() {
     timeSeriesData.forEach((p) => {
       if (p.total > peakCount) {
         peakCount = p.total
-        peakDay = p.date
+        peakDay = p.fullDate || p.date
       }
     })
 
@@ -204,7 +255,7 @@ export default function Trends() {
     {
       title: 'Events in Selected Range',
       value: calculatedKpis.totalEvents.toLocaleString(),
-      change: `${timeSeriesData.length} Data Points Analyzed`,
+      change: `${timeSeriesData.length} Time Intervals`,
       changeColor: 'text-emerald-700 font-bold',
       icon: Activity,
       iconBg: 'bg-teal-50 text-teal-700',
@@ -252,8 +303,8 @@ export default function Trends() {
   ]
 
   const handleDownloadCsv = () => {
-    const headers = ['Date', 'Industrial', 'Persistent Flare/Kiln', 'Agricultural Burn', 'Forest Fire', 'Unknown', 'Total']
-    const rows = timeSeriesData.map((p) => [p.date, p.industrial, p.flare, p.agri, p.forest, p.unknown, p.total])
+    const headers = ['Date', 'Full Date', 'Industrial', 'Persistent Flare/Kiln', 'Agricultural Burn', 'Forest Fire', 'Unknown', 'Total']
+    const rows = timeSeriesData.map((p) => [p.date, p.fullDate, p.industrial, p.flare, p.agri, p.forest, p.unknown, p.total])
     const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
     const encodedUri = encodeURI(csvContent)
     const link = document.createElement('a')
@@ -278,7 +329,7 @@ export default function Trends() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 self-start md:self-auto">
+        <div className="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
           {/* Interactive Date Range Calendar Picker */}
           <DateRangePicker
             startDate={startDate}
@@ -286,6 +337,7 @@ export default function Trends() {
             onChange={(start, end) => {
               setStartDate(start)
               setEndDate(end)
+              setActiveQuickRange('Custom')
             }}
           />
 
@@ -351,8 +403,7 @@ export default function Trends() {
                 setRegionFilter('all')
                 setClassFilter('all')
                 setGranularity('daily')
-                setStartDate('2026-07-28')
-                setEndDate('2026-08-27')
+                handleQuickRange(30, '30D')
               }}
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 transition-colors border border-slate-200 shadow-2xs"
             >
@@ -386,20 +437,45 @@ export default function Trends() {
 
       {/* Stacked Area Chart Card: Detections Over Time (by Classification) */}
       <div className="card p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2">
             <h2 className="font-bold text-slate-900 text-sm">Detections Over Time (by Classification)</h2>
             <Info className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-xs font-medium text-slate-500 ml-2">
+            <span className="text-xs font-medium text-slate-500 hidden sm:inline">
               ({startDate} to {endDate})
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Quick Range Zoom Selector */}
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600">
+              {[
+                { label: '7D', days: 7 },
+                { label: '14D', days: 14 },
+                { label: '30D', days: 30 },
+                { label: '90D', days: 90 },
+                { label: '1Y', days: 365 },
+                { label: 'All', days: 2400 },
+              ].map((btn) => (
+                <button
+                  key={btn.label}
+                  onClick={() => handleQuickRange(btn.days, btn.label)}
+                  className={`px-2.5 py-1 rounded-md transition-all ${
+                    activeQuickRange === btn.label
+                      ? 'bg-white text-teal-800 font-bold shadow-2xs'
+                      : 'hover:text-slate-900 text-slate-500'
+                  }`}
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+
             <div className="flex items-center gap-1 text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
               <span className="capitalize">{granularity}</span>
               <ChevronDown className="w-3 h-3 text-slate-400" />
             </div>
+
             <button
               onClick={() => setClassFilter('all')}
               className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-colors ${
@@ -420,7 +496,7 @@ export default function Trends() {
           </div>
         )}
 
-        <div className="h-72 w-full">
+        <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={timeSeriesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
@@ -446,9 +522,15 @@ export default function Trends() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} stroke="#CBD5E1" />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 11, fill: '#64748B' }}
+                stroke="#CBD5E1"
+                minTickGap={35}
+                interval="preserveStartEnd"
+              />
               <YAxis tick={{ fontSize: 11, fill: '#64748B' }} stroke="#CBD5E1" />
-              <Tooltip />
+              <Tooltip content={<CustomTrendsTooltip />} />
               {(classFilter === 'all' || classFilter === 'Industrial Incident') && (
                 <Area type="monotone" dataKey="industrial" stackId="1" stroke="#EF4444" strokeWidth={2} fill="url(#colorInd)" name="Industrial Incident" />
               )}
@@ -464,17 +546,80 @@ export default function Trends() {
               {(classFilter === 'all' || classFilter === 'Unknown') && (
                 <Area type="monotone" dataKey="unknown" stackId="1" stroke="#64748B" strokeWidth={2} fill="url(#colorUnknown)" name="Unknown" />
               )}
+              {/* Interactive Draggable Range Selector Brush */}
+              <Brush
+                dataKey="date"
+                height={28}
+                stroke="#0D9488"
+                fill="#F8FAFC"
+                fillOpacity={0.9}
+                travellerWidth={10}
+                tickFormatter={(val) => val}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
+        {/* Drag to Zoom helper info */}
+        <div className="flex items-center justify-between mt-2 px-1 text-[11px] text-slate-400 font-medium">
+          <div className="flex items-center gap-1.5">
+            <ZoomIn className="w-3.5 h-3.5 text-teal-600" />
+            <span>Drag the handles in the timeline slider above to zoom into any custom sub-range.</span>
+          </div>
+          <span>Showing {timeSeriesData.length} data points</span>
+        </div>
+
         {/* Legend Row */}
-        <div className="flex flex-wrap items-center justify-center gap-6 mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-700">
-          <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-rose-500" /><span>Industrial</span></div>
-          <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-orange-500" /><span>Persistent Flare/Kiln</span></div>
-          <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /><span>Agricultural Burn</span></div>
-          <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-purple-500" /><span>Forest Fire</span></div>
-          <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-slate-500" /><span>Unknown</span></div>
+        <div className="flex flex-wrap items-center justify-center gap-6 mt-3 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-700">
+          <button
+            onClick={() => setClassFilter(classFilter === 'Industrial Incident' ? 'all' : 'Industrial Incident')}
+            className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-colors ${
+              classFilter === 'Industrial Incident' ? 'bg-rose-50 border border-rose-200' : 'hover:bg-slate-50'
+            }`}
+          >
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+            <span>Industrial</span>
+          </button>
+
+          <button
+            onClick={() => setClassFilter(classFilter === 'Persistent Flare/Kiln' ? 'all' : 'Persistent Flare/Kiln')}
+            className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-colors ${
+              classFilter === 'Persistent Flare/Kiln' ? 'bg-orange-50 border border-orange-200' : 'hover:bg-slate-50'
+            }`}
+          >
+            <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
+            <span>Persistent Flare/Kiln</span>
+          </button>
+
+          <button
+            onClick={() => setClassFilter(classFilter === 'Agricultural Burn' ? 'all' : 'Agricultural Burn')}
+            className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-colors ${
+              classFilter === 'Agricultural Burn' ? 'bg-emerald-50 border border-emerald-200' : 'hover:bg-slate-50'
+            }`}
+          >
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span>Agricultural Burn</span>
+          </button>
+
+          <button
+            onClick={() => setClassFilter(classFilter === 'Forest Fire' ? 'all' : 'Forest Fire')}
+            className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-colors ${
+              classFilter === 'Forest Fire' ? 'bg-purple-50 border border-purple-200' : 'hover:bg-slate-50'
+            }`}
+          >
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+            <span>Forest Fire</span>
+          </button>
+
+          <button
+            onClick={() => setClassFilter(classFilter === 'Unknown' ? 'all' : 'Unknown')}
+            className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-colors ${
+              classFilter === 'Unknown' ? 'bg-slate-100 border border-slate-300' : 'hover:bg-slate-50'
+            }`}
+          >
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-500" />
+            <span>Unknown</span>
+          </button>
         </div>
       </div>
 
